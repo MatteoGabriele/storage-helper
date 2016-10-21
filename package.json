@@ -1,11 +1,11 @@
 {
-  "name": "localstorage",
+  "name": "storage-helper",
   "version": "0.0.1",
   "description": "Simple localStorage util",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MatteoGabriele/localstorage.git"
+    "url": "git+https://github.com/MatteoGabriele/storage-helper.git"
   },
   "scripts": {
     "build": "./node_modules/.bin/babel src -d dist"
@@ -19,9 +19,9 @@
   "author": "Matteo Gabriele <m.gabriele.dev@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MatteoGabriele/localstorage/issues"
+    "url": "https://github.com/MatteoGabriele/storage-helper/issues"
   },
-  "homepage": "https://github.com/MatteoGabriele/localstorage#readme",
+  "homepage": "https://github.com/MatteoGabriele/storage-helper#readme",
   "devDependencies": {
     "babel-cli": "^6.16.0",
     "babel-preset-es2015": "^6.16.0"
