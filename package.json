@@ -1,6 +1,6 @@
 {
   "name": "storage-helper",
-  "version": "0.0.1",
+  "version": "0.0.1-b",
   "description": "Simple localStorage util",
   "main": "dist/index.js",
   "repository": {
