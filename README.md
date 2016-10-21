@@ -1,6 +1,6 @@
 # Storage Helper
 A very simple way to manager localStorage.
-If doesn't exitst, the locastorage won throw an error, because will just saved inside an object.
+If doesn't exist, the locaStorage won't throw an error, because will just be saved inside an object.
 
 ``` js
 import { setItem, getItem, removeItem } from 'storage-helper'
