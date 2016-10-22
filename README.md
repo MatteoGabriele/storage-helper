@@ -1,6 +1,6 @@
 # Storage Helper
-A very simple way to manager localStorage.
-If doesn't exist, the locaStorage won't throw an error, because will just be saved inside an object.
+A very simple way to manage localStorage. Nothing fency!
+If it's not suppoerted in the browser or the user is in a private window, won't throw an error, because data will just be saved inside an object.
 
 ``` js
 import { setItem, getItem, removeItem } from 'storage-helper'
