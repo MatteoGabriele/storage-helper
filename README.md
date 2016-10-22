@@ -1,6 +1,6 @@
 # Storage Helper
 A very simple way to manage localStorage. Nothing fency!
-If it's not suppoerted in the browser or the user is in a private window, won't throw an error, because data will just be saved inside an object.
+If it's not supported in the browser or the user is in a private window, won't throw an error, because data will just be saved inside an object.
 
 ``` js
 import { setItem, getItem, removeItem } from 'storage-helper'
