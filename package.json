@@ -1,7 +1,7 @@
 {
   "name": "storage-helper",
-  "version": "0.0.1-b",
-  "description": "Simple localStorage util",
+  "version": "1.0.0",
+  "description": "A very simple way to manage localStorage",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
