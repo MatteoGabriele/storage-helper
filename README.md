@@ -1,20 +1,25 @@
 # Storage Helper
-A very simple way to manage localStorage. Nothing fency!
+A very simple way to manage localStorage. Nothing fancy!
 If it's not supported in the browser or the user is in a private window, won't throw an error, because data will just be saved inside an object.
 
 ``` js
 import { setItem, getItem, removeItem } from 'storage-helper'
 
+const storageKey = 'foo'
+const value = 'bar'
+
 // set data
-setItem('foo', 'bar')
-// set data permanently or not
-setItem('foo', 'bar', false)
+setItem(storageKey, value)
+
+// set data not permanently 
+setItem(storageKey, value, false)
 
 // get data
-const foo = getItem('foo')
+const foo = getItem(storageKey)
+
 // get data parsed
-const foo = getItem('foo', true)
+const foo = getItem(storageKey, true)
 
 // remove data
-removeItem('foo')
+removeItem(storageKey)
 ```
