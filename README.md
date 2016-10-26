@@ -2,6 +2,12 @@
 A very simple way to manage localStorage. Nothing fancy!
 If it's not supported in the browser or the user is in a private window, won't throw an error, because data will just be saved inside an object.
 
+## Installation
+```js
+npm install storage-helper
+```
+## Usage
+
 ``` js
 import { setItem, getItem, removeItem } from 'storage-helper'
 
