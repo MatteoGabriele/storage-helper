@@ -3,78 +3,103 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-/**
- * Used in case the browser doesn't support localStorage
- * @type {Object}
- */
-var storage = {};
-var localStorage = window.localStorage;
 
-/**
- * Check if the browser has localStorage available
- * @return {Boolean}
- */
+var localstorage = window.localStorage;
+
+var sessionStorage = {};
+
+var checker = void 0;
+
 var hasLocalStorage = function hasLocalStorage() {
-  var available = true;
+  if (typeof checker !== 'undefined') {
+    return checker;
+  }
+
+  if (!localstorage) {
+    return checker = false;
+  }
 
   try {
-    localStorage.setItem('0', '');
-    localStorage.removeItem('0');
+    localstorage.setItem('0', '');
+    localstorage.removeItem('0');
+    checker = true;
   } catch (e) {
-    available = false;
+    checker = false;
   }
 
-  return available;
+  return checker;
 };
 
-/**
- * Stores the key value pair
- * @param {String}  key
- * @param {String}  value
- * @param {Boolean} permanent
- */
+var log = function log(text) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
+
+  var success = 'padding: 2px; background: #219621; color: #ffffff';
+  var error = 'padding: 2px; background: #b9090b; color: #ffffff';
+  var types = { error: error, success: success };
+
+  console.log('%c [Storage Helper] ' + text + ' ', types[type]);
+};
+
 var setItem = exports.setItem = function setItem(key, value) {
-  var permanent = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  var persistency = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
-  if (!hasLocalStorage() || !permanent) {
-    storage[key] = value;
-  }
-
-  localStorage.setItem(key, value);
-};
-
-/**
- * Return the stored value
- * @type {String} key
- * @type {Boolean} parse
- * @return {any}
- */
-var getItem = exports.getItem = function getItem(key) {
-  var parse = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-  if (!hasLocalStorage()) {
-    return storage[key];
-  }
-
-  var item = localStorage.getItem(key) || storage[key];
-
-  return item && parse ? JSON.parse(item) : item;
-};
-
-/**
- * Remove the store value
- * @param  {string} key
- */
-var removeItem = exports.removeItem = function removeItem(key) {
-  if (!hasLocalStorage) {
-    if (!storage[key]) {
-      return;
-    }
-
-    delete storage[key];
-
+  if (!hasLocalStorage() || !persistency) {
+    sessionStorage[key] = value;
     return;
   }
 
-  localStorage.removeItem(key);
+  try {
+    localstorage.setItem(key, value);
+  } catch (e) {
+    var code = e.code;
+
+    if (code === 22 || code === 1014) {
+      log('Quota exceeded!', 'error');
+      log('I\'ve saved that in the session storage :)', 'success');
+
+      sessionStorage[key] = value;
+    }
+  }
 };
+
+var getItem = exports.getItem = function getItem(key) {
+  var parsed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  if (!hasLocalStorage()) {
+    return parsed ? sessionStorage[key] : JSON.stringify(sessionStorage[key]);
+  }
+
+  var item = localstorage.getItem(key) || sessionStorage[key];
+
+  return parsed ? JSON.parse(item) : item;
+};
+
+var clear = exports.clear = function clear() {
+  if (!hasLocalStorage()) {
+    sessionStorage = {};
+    return;
+  }
+
+  sessionStorage = {};
+  localstorage.clear();
+};
+
+var removeItem = exports.removeItem = function removeItem(key) {
+  if (!hasLocalStorage()) {
+    removeSessionItem(key);
+    return;
+  }
+
+  removeSessionItem(key);
+  localstorage.removeItem(key);
+};
+
+var removeSessionItem = function removeSessionItem(key) {
+  if (!sessionStorage[key]) {
+    return;
+  }
+
+  delete sessionStorage[key];
+};
+
+exports.default = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };

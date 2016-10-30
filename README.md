@@ -1,6 +1,11 @@
 # Storage Helper
-A very simple way to manage localStorage. Nothing fancy!
-If it's not supported in the browser or the user is in a private window, won't throw an error, because data will just be saved inside an object.
+A very simple way to manage localStorage. Nothing fancy here!
+
+
+If the browser doesn't support localStorage, data will be saved in an object.
+
+It also handles the QuotaExceeded error, silently logging it in the console and saving the data in the object.
+
 
 ## Installation
 ```js
@@ -9,23 +14,33 @@ npm install storage-helper
 ## Usage
 
 ``` js
-import { setItem, getItem, removeItem } from 'storage-helper'
+import storageHelper from 'storage-helper'
 
 const storageKey = 'foo'
 const value = 'bar'
 
-// set data
-setItem(storageKey, value)
+// set item
+storageHelper.setItem(storageKey, value)
 
-// set data not permanently 
-setItem(storageKey, value, false)
+// set an item not permanently  
+storageHelper.setItem(storageKey, value, false)
 
-// get data
-const foo = getItem(storageKey)
+// get item
+const foo = storageHelper.getItem(storageKey)
 
-// get data parsed
-const foo = getItem(storageKey, true)
+// get item parsed
+const foo = storageHelper.getItem(storageKey, true)
 
-// remove data
-removeItem(storageKey)
+// remove item
+storageHelper.removeItem(storageKey)
+
+// remove all items
+storageHelper.clear()
+```
+
+It's also possible to export single functions from the module
+```js
+import { clear } from 'storage-helper'
+
+clear()
 ```
