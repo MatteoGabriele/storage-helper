@@ -90,8 +90,7 @@ export const setItem = (key, value, persistency = true) => {
 export const getItem = (key, parsed = false) => {
   if (!hasLocalStorage()) {
     /**
-     * Even though we saved it in our session storage, so it's actually
-     * always a primitive, we are going to treat it like a string from
+     * Even though we saved it in our session storage, we are going to treat it like a string from
      * the localStorage because you don't know where it was stored.
      */
     return parsed ? sessionStorage[key] : JSON.stringify(sessionStorage[key])
