@@ -2,7 +2,9 @@
 A very simple way to manage localStorage. Nothing fancy here!
 
 
-If the browser doesn't support localStorage, data will be saved in an object.
+If the browser doesn't support localStorage, data will be saved in a cookie.
+
+If the browser then doesn't support cookies either (not lucky day!), it will be saved in a plain object!
 
 It also handles the QuotaExceeded error, silently logging it in the console and saving the data in the object.
 

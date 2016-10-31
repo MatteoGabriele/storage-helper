@@ -1,12 +1,15 @@
+const isCookieEnabled = navigator && navigator.cookieEnabled
+
 /**
  * Reference to the localStorage object
  * @type {LocalStorage}
  */
-const localstorage = window.localStorage
+const localstorage = isCookieEnabled ? window.localStorage : undefined
 
 /**
- * This will be our session storage in case of the localStorage is
- * not available.
+ * This will be our session storage in case of everything fails!
+ * First will try to use localStorage, then cookies and if we can't write
+ * that either, we're gonna store it here.
  * @type {Object}
  */
 let sessionStorage = {}
@@ -44,8 +47,9 @@ const hasLocalStorage = () => {
 
 const log = (text, type = 'success') => {
   const success = 'padding: 2px; background: #219621; color: #ffffff'
+  const warning = 'padding: 2px; background: #f1e05a; color: #333333'
   const error = 'padding: 2px; background: #b9090b; color: #ffffff'
-  const types = { error, success }
+  const types = { error, success, warning }
 
   console.log(`%c [Storage Helper] ${text} `, types[type])
 }
@@ -61,7 +65,12 @@ const log = (text, type = 'success') => {
  */
 export const setItem = (key, value, persistency = true) => {
   if (!hasLocalStorage() || !persistency) {
-    sessionStorage[key] = value
+    if (!persistency) {
+      setSessionItem(key, value)
+      return
+    }
+
+    setCookie(key, value)
     return
   }
 
@@ -69,12 +78,12 @@ export const setItem = (key, value, persistency = true) => {
     localstorage.setItem(key, value)
   } catch (e) {
     const { code } = e
-    if (code === 22 || code === 1014) {
-      log('Quota exceeded!', 'error')
-      log('I\'ve saved that in the session storage :)', 'success')
 
-      // Saving it anyway in the session storage
-      sessionStorage[key] = value
+    if (code === 22 || code === 1014) {
+      log(`Quota exceeded for "${key}"!`, 'error')
+
+      // Let's try with cookies then!
+      setCookie(key, value)
     }
   }
 }
@@ -89,11 +98,10 @@ export const setItem = (key, value, persistency = true) => {
  */
 export const getItem = (key, parsed = false) => {
   if (!hasLocalStorage()) {
-    /**
-     * Even though we saved it in our session storage, we are going to treat it like a string from
-     * the localStorage because you don't know where it was stored.
-     */
-    return parsed ? sessionStorage[key] : JSON.stringify(sessionStorage[key])
+    const cookie = getCookie(key)
+    const item = cookie !== '' ? cookie : getSessionItem(key)
+
+    return parsed ? JSON.parse(item) : item
   }
 
   const item = localstorage.getItem(key) || sessionStorage[key]
@@ -105,12 +113,13 @@ export const getItem = (key, parsed = false) => {
  * Clear all storage
  */
 export const clear = () => {
+  clearAllSessionItems()
+  clearAllCookies()
+
   if (!hasLocalStorage()) {
-    sessionStorage = {}
     return
   }
 
-  sessionStorage = {}
   localstorage.clear()
 }
 
@@ -119,13 +128,109 @@ export const clear = () => {
  * @param  {String}  key
  */
 export const removeItem = (key) => {
+  removeSessionItem(key)
+  removeCookie(key)
+
   if (!hasLocalStorage()) {
-    removeSessionItem(key)
     return
   }
 
-  removeSessionItem(key)
   localstorage.removeItem(key)
+}
+
+const setCookie = (key, value, exdays = 1) => {
+  if (window.navigator && !window.navigator.cookieEnabled) {
+    setSessionItem(key, value)
+    log(`I've saved "${key}" in a plain object :)`, 'warning')
+    return
+  }
+
+  document.cookie = getCookieString(key, value, exdays)
+  log(`I've saved "${key}" in a cookie :)`, 'warning')
+}
+
+const getCookieString = (key, value, exdays) => {
+  const d = new Date()
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000))
+
+  const expires = `expires=${d.toUTCString()}`
+
+  return `${key}=${value};${expires};path=/`
+}
+
+/**
+ * Get value from a cookie
+ * @param  {String} key
+ * @return {String}
+ */
+const getCookie = (key) => {
+  const name = `${key}=`
+  const cookies = document.cookie.split(';')
+
+  for (let i = 0, l = cookies.length; i < l; i++) {
+    let cookie = cookies[i]
+
+    while (cookie.charAt(0) === ' ') {
+      cookie = cookie.substring(1)
+    }
+
+    if (cookie.indexOf(name) === 0) {
+      return cookie.substring(name.length, cookie.length)
+    }
+  }
+
+  return ''
+}
+
+/**
+ * Remove cookie
+ * @param  {[type]} key [description]
+ * @return {[type]}     [description]
+ */
+const removeCookie = (key) => {
+  document.cookie = getCookieString(key, '', -10)
+}
+
+/**
+ * Remove all cookies
+ */
+const clearAllCookies = () => {
+  const cookies = document.cookie.split(';')
+
+  if (!cookies.length) {
+    return
+  }
+
+  for (let i = 0, l = cookies.length; i < l; i++) {
+    const cookie = cookies[i]
+    const cookiesName = cookie.split('=')[0]
+
+    removeCookie(cookiesName)
+  }
+}
+
+/**
+ * Add item in out session storage
+ * @param {String} key
+ * @param {String} value
+ */
+const setSessionItem = (key, value) => {
+  sessionStorage[key] = value
+}
+
+/**
+ * Return the item from out session storage
+ * It will always returns a string so every data will be
+ * treated like it comes from the localStorage.
+ * @param  {String} key
+ * @return {String}
+ */
+const getSessionItem = (key) => {
+  return JSON.stringify(sessionStorage[key] || '')
+}
+
+const clearAllSessionItems = () => {
+  sessionStorage = {}
 }
 
 /**
