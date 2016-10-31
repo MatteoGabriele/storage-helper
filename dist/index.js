@@ -70,13 +70,8 @@ var setItem = exports.setItem = function setItem(key, value) {
 };
 
 var getItem = exports.getItem = function getItem(key) {
-  var parsed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
   if (!hasLocalStorage()) {
-    var cookie = getCookie(key);
-    var _item = cookie !== '' ? cookie : getSessionItem(key);
-
-    return parsed ? JSON.parse(_item) : _item;
+    return getCookie(key) || getSessionItem(key);
   }
 
   var item = localstorage.getItem(key) || sessionStorage[key];
@@ -144,7 +139,7 @@ var getCookie = function getCookie(key) {
     }
   }
 
-  return '';
+  return null;
 };
 
 var removeCookie = function removeCookie(key) {
@@ -171,7 +166,8 @@ var setSessionItem = function setSessionItem(key, value) {
 };
 
 var getSessionItem = function getSessionItem(key) {
-  return JSON.stringify(sessionStorage[key] || '');
+  var item = sessionStorage[key];
+  return item ? JSON.stringify(item) : null;
 };
 
 var clearAllSessionItems = function clearAllSessionItems() {

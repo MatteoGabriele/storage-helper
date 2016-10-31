@@ -2,14 +2,13 @@
   "name": "storage-helper",
   "version": "1.2.0",
   "description": "A very simple way to manage localStorage",
-  "main": "dist/index.js",
+  "main": "dist/storage-helper.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MatteoGabriele/storage-helper.git"
   },
   "scripts": {
-    "build": "./node_modules/.bin/babel src -d dist",
-    "dev": "./node_modules/.bin/babel ./src/index.js --watch --out-file ./dist/index.js"
+    "dev": "./node_modules/.bin/webpack -w"
   },
   "keywords": [
     "localStorage",
@@ -24,8 +23,19 @@
   },
   "homepage": "https://github.com/MatteoGabriele/storage-helper#readme",
   "devDependencies": {
-    "babel-cli": "^6.16.0",
+    "babel-core": "^6.17.0",
+    "babel-eslint": "^7.0.0",
+    "babel-loader": "^6.2.5",
     "babel-preset-es2015": "^6.16.0",
-    "chokidar": "^1.6.1"
+    "babel-preset-stage-2": "^6.17.0",
+    "babel-register": "^6.16.3",
+    "eslint": "^3.8.1",
+    "eslint-config-standard": "^6.2.0",
+    "eslint-friendly-formatter": "^2.0.6",
+    "eslint-import-resolver-webpack": "^0.6.0",
+    "eslint-loader": "^1.6.0",
+    "eslint-plugin-promise": "^3.3.0",
+    "eslint-plugin-standard": "^2.0.1",
+    "webpack": "^1.13.2"
   }
 }
