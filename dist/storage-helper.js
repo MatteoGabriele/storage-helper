@@ -70,11 +70,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	var _session = __webpack_require__(6);
+	var _session = __webpack_require__(2);
 
 	var _session2 = _interopRequireDefault(_session);
 
-	var _cookie = __webpack_require__(7);
+	var _cookie = __webpack_require__(3);
 
 	var _cookie2 = _interopRequireDefault(_cookie);
 
@@ -187,39 +187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };
 
 /***/ },
-/* 2 */,
-/* 3 */,
-/* 4 */,
-/* 5 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var log = exports.log = function log(text) {
-	  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
-
-	  var success = 'padding: 2px; background: #219621; color: #ffffff';
-	  var warning = 'padding: 2px; background: #f1e05a; color: #333333';
-	  var error = 'padding: 2px; background: #b9090b; color: #ffffff';
-	  var types = { error: error, success: success, warning: warning };
-
-	  console.log('%c [Storage Helper] ' + text + ' ', types[type]);
-	};
-
-	var getCookieString = exports.getCookieString = function getCookieString(key, value) {
-	  var exdays = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-
-	  var date = new Date();
-	  date.setTime(date.getTime() + exdays * 24 * 60 * 60 * 1000);
-
-	  return key + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
-	};
-
-/***/ },
-/* 6 */
+/* 2 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -253,7 +221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };
 
 /***/ },
-/* 7 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -262,16 +230,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: true
 	});
 
-	var _session = __webpack_require__(6);
+	var _session = __webpack_require__(2);
 
 	var _session2 = _interopRequireDefault(_session);
+
+	var _jsCookie = __webpack_require__(4);
+
+	var _jsCookie2 = _interopRequireDefault(_jsCookie);
 
 	var _utils = __webpack_require__(5);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var setItem = function setItem(key, value) {
-	  var exdays = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+	  var expires = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
 	  if (window.navigator && !window.navigator.cookieEnabled) {
 	    _session2.default.set(key, value);
@@ -279,29 +251,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 
-	  document.cookie = (0, _utils.getCookieString)(key, value, exdays);
+	  _jsCookie2.default.set(key, value, { expires: expires });
 	  (0, _utils.log)('I\'ve saved "' + key + '" in a cookie :)', 'warning');
 	};
 
 	var getItem = function getItem(key) {
-	  var cookies = document.cookie.split(';');
-
-	  for (var i = 0, l = cookies.length; i < l; i++) {
-	    var cookie = cookies[i].trim();
-	    var keyValuePair = cookie.split('=');
-
-	    if (keyValuePair.indexOf(key) === -1) {
-	      continue;
-	    }
-
-	    return keyValuePair[1];
-	  }
-
-	  return null;
+	  return _jsCookie2.default.get(key);
 	};
 
 	var removeItem = function removeItem(key) {
-	  document.cookie = (0, _utils.getCookieString)(key, '', -10);
+	  _jsCookie2.default.remove(key);
 	};
 
 	var clear = function clear() {
@@ -313,13 +272,195 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  for (var i = 0, l = cookies.length; i < l; i++) {
 	    var cookie = cookies[i];
-	    var cookiesName = cookie.split('=')[0];
+	    var key = cookie.split('=')[0];
 
-	    removeItem(cookiesName);
+	    _jsCookie2.default.remove(key);
 	  }
 	};
 
 	exports.default = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	 * JavaScript Cookie v2.1.3
+	 * https://github.com/js-cookie/js-cookie
+	 *
+	 * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
+	 * Released under the MIT license
+	 */
+	;(function (factory) {
+		var registeredInModuleLoader = false;
+		if (true) {
+			!(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			registeredInModuleLoader = true;
+		}
+		if (true) {
+			module.exports = factory();
+			registeredInModuleLoader = true;
+		}
+		if (!registeredInModuleLoader) {
+			var OldCookies = window.Cookies;
+			var api = window.Cookies = factory();
+			api.noConflict = function () {
+				window.Cookies = OldCookies;
+				return api;
+			};
+		}
+	}(function () {
+		function extend () {
+			var i = 0;
+			var result = {};
+			for (; i < arguments.length; i++) {
+				var attributes = arguments[ i ];
+				for (var key in attributes) {
+					result[key] = attributes[key];
+				}
+			}
+			return result;
+		}
+
+		function init (converter) {
+			function api (key, value, attributes) {
+				var result;
+				if (typeof document === 'undefined') {
+					return;
+				}
+
+				// Write
+
+				if (arguments.length > 1) {
+					attributes = extend({
+						path: '/'
+					}, api.defaults, attributes);
+
+					if (typeof attributes.expires === 'number') {
+						var expires = new Date();
+						expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
+						attributes.expires = expires;
+					}
+
+					try {
+						result = JSON.stringify(value);
+						if (/^[\{\[]/.test(result)) {
+							value = result;
+						}
+					} catch (e) {}
+
+					if (!converter.write) {
+						value = encodeURIComponent(String(value))
+							.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
+					} else {
+						value = converter.write(value, key);
+					}
+
+					key = encodeURIComponent(String(key));
+					key = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);
+					key = key.replace(/[\(\)]/g, escape);
+
+					return (document.cookie = [
+						key, '=', value,
+						attributes.expires ? '; expires=' + attributes.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+						attributes.path ? '; path=' + attributes.path : '',
+						attributes.domain ? '; domain=' + attributes.domain : '',
+						attributes.secure ? '; secure' : ''
+					].join(''));
+				}
+
+				// Read
+
+				if (!key) {
+					result = {};
+				}
+
+				// To prevent the for loop in the first place assign an empty array
+				// in case there are no cookies at all. Also prevents odd result when
+				// calling "get()"
+				var cookies = document.cookie ? document.cookie.split('; ') : [];
+				var rdecode = /(%[0-9A-Z]{2})+/g;
+				var i = 0;
+
+				for (; i < cookies.length; i++) {
+					var parts = cookies[i].split('=');
+					var cookie = parts.slice(1).join('=');
+
+					if (cookie.charAt(0) === '"') {
+						cookie = cookie.slice(1, -1);
+					}
+
+					try {
+						var name = parts[0].replace(rdecode, decodeURIComponent);
+						cookie = converter.read ?
+							converter.read(cookie, name) : converter(cookie, name) ||
+							cookie.replace(rdecode, decodeURIComponent);
+
+						if (this.json) {
+							try {
+								cookie = JSON.parse(cookie);
+							} catch (e) {}
+						}
+
+						if (key === name) {
+							result = cookie;
+							break;
+						}
+
+						if (!key) {
+							result[name] = cookie;
+						}
+					} catch (e) {}
+				}
+
+				return result;
+			}
+
+			api.set = api;
+			api.get = function (key) {
+				return api.call(api, key);
+			};
+			api.getJSON = function () {
+				return api.apply({
+					json: true
+				}, [].slice.call(arguments));
+			};
+			api.defaults = {};
+
+			api.remove = function (key, attributes) {
+				api(key, '', extend(attributes, {
+					expires: -1
+				}));
+			};
+
+			api.withConverter = init;
+
+			return api;
+		}
+
+		return init(function () {});
+	}));
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var log = exports.log = function log(text) {
+	  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
+
+	  var success = 'padding: 2px; background: #219621; color: #ffffff';
+	  var warning = 'padding: 2px; background: #f1e05a; color: #333333';
+	  var error = 'padding: 2px; background: #b9090b; color: #ffffff';
+	  var types = { error: error, success: success, warning: warning };
+
+	  console.log('%c [Storage Helper] ' + text + ' ', types[type]);
+	};
 
 /***/ }
 /******/ ])

@@ -1,7 +1,7 @@
 {
   "name": "storage-helper",
-  "version": "1.2.0",
-  "description": "A very simple way to manage localStorage",
+  "version": "1.2.1",
+  "description": "A very simple way to manage browser storage",
   "main": "dist/storage-helper.js",
   "repository": {
     "type": "git",
@@ -14,7 +14,9 @@
     "localStorage",
     "local",
     "storage",
-    "localstorage"
+    "localstorage",
+    "cookie",
+    "cookies"
   ],
   "author": "Matteo Gabriele <m.gabriele.dev@gmail.com>",
   "license": "ISC",
@@ -37,5 +39,8 @@
     "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
     "webpack": "^1.13.2"
+  },
+  "dependencies": {
+    "js-cookie": "^2.1.3"
   }
 }

@@ -1,14 +1,15 @@
 import session from './session'
-import { getCookieString, log } from './utils'
+import jsCookie from 'js-cookie'
+import { log } from './utils'
 
-const setItem = (key, value, exdays = 1) => {
+const setItem = (key, value, expires = 1) => {
   if (window.navigator && !window.navigator.cookieEnabled) {
     session.set(key, value)
     log(`I've saved "${key}" in a plain object :)`, 'warning')
     return
   }
 
-  document.cookie = getCookieString(key, value, exdays)
+  jsCookie.set(key, value, { expires })
   log(`I've saved "${key}" in a cookie :)`, 'warning')
 }
 
@@ -18,20 +19,7 @@ const setItem = (key, value, exdays = 1) => {
  * @return {String}
  */
 const getItem = (key) => {
-  const cookies = document.cookie.split(';')
-
-  for (let i = 0, l = cookies.length; i < l; i++) {
-    const cookie = cookies[i].trim()
-    const keyValuePair = cookie.split('=')
-
-    if (keyValuePair.indexOf(key) === -1) {
-      continue
-    }
-
-    return keyValuePair[1]
-  }
-
-  return null
+  return jsCookie.get(key)
 }
 
 /**
@@ -39,7 +27,7 @@ const getItem = (key) => {
  * @param  {String} key [description]
  */
 const removeItem = (key) => {
-  document.cookie = getCookieString(key, '', -10)
+  jsCookie.remove(key)
 }
 
 /**
@@ -54,9 +42,9 @@ const clear = () => {
 
   for (let i = 0, l = cookies.length; i < l; i++) {
     const cookie = cookies[i]
-    const cookiesName = cookie.split('=')[0]
+    const key = cookie.split('=')[0]
 
-    removeItem(cookiesName)
+    jsCookie.remove(key)
   }
 }
 

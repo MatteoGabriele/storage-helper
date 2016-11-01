@@ -11,17 +11,3 @@ export const log = (text, type = 'success') => {
 
   console.log(`%c [Storage Helper] ${text} `, types[type])
 }
-
-/**
- * It creates a cookie string based on key, value and expiring date
- * @param  {String} key
- * @param  {String} value
- * @param  {Number} exdays
- * @return {String}
- */
-export const getCookieString = (key, value, exdays = 1) => {
-  const date = new Date()
-  date.setTime(date.getTime() + (exdays * 24 * 60 * 60 * 1000))
-
-  return `${key}=${value};expires=${date.toUTCString()};path=/`
-}
