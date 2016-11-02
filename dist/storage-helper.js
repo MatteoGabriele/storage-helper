@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.removeItem = exports.clear = exports.getItem = exports.setItem = undefined;
+	exports.showStorageLogger = exports.removeItem = exports.clear = exports.getItem = exports.setItem = undefined;
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -79,6 +79,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _cookie2 = _interopRequireDefault(_cookie);
 
 	var _utils = __webpack_require__(5);
+
+	var _config = __webpack_require__(6);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -128,7 +130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	    if (code === 22 || code === 1014) {
-	      (0, _utils.log)('Quota exceeded for "' + key + '"!', 'error');
+	      (0, _utils.log)('Quota exceeded for "' + key + '"!', 'error', _config.debug);
 
 	      _cookie2.default.setItem(key, value);
 	    }
@@ -153,9 +155,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return parsed ? JSON.parse(result) : result;
 	  } catch (e) {
 	    if (parsed) {
-	      (0, _utils.log)('Oops! Some problems parsing this ' + (typeof result === 'undefined' ? 'undefined' : _typeof(result)) + '.', 'error');
+	      (0, _utils.log)('Oops! Some problems parsing this ' + (typeof result === 'undefined' ? 'undefined' : _typeof(result)) + '.', 'error', _config.debug);
 	    } else {
-	      (0, _utils.log)(e, 'error');
+	      (0, _utils.log)(e, 'error', _config.debug);
 	    }
 	  }
 
@@ -182,6 +184,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  localstorage.removeItem(key);
+	};
+
+	var showStorageLogger = exports.showStorageLogger = function showStorageLogger(value) {
+	  (0, _config.setDebug)(!!value);
 	};
 
 	exports.default = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };
@@ -240,6 +246,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utils = __webpack_require__(5);
 
+	var _config = __webpack_require__(6);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var setItem = function setItem(key, value) {
@@ -247,12 +255,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (window.navigator && !window.navigator.cookieEnabled) {
 	    _session2.default.set(key, value);
-	    (0, _utils.log)('I\'ve saved "' + key + '" in a plain object :)', 'warning');
+	    (0, _utils.log)('I\'ve saved "' + key + '" in a plain object :)', 'warning', _config.debug);
 	    return;
 	  }
 
 	  _jsCookie2.default.set(key, value, { expires: expires });
-	  (0, _utils.log)('I\'ve saved "' + key + '" in a cookie :)', 'warning');
+	  (0, _utils.log)('I\'ve saved "' + key + '" in a cookie :)', 'warning', _config.debug);
 	};
 
 	var getItem = function getItem(key) {
@@ -271,8 +279,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  for (var i = 0, l = cookies.length; i < l; i++) {
-	    var cookie = cookies[i];
-	    var key = cookie.split('=')[0];
+	    var item = cookies[i];
+	    var key = item.split('=')[0];
 
 	    _jsCookie2.default.remove(key);
 	  }
@@ -453,6 +461,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	var log = exports.log = function log(text) {
 	  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
+	  var debug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+	  if (!debug) {
+	    return;
+	  }
 
 	  var success = 'padding: 2px; background: #219621; color: #ffffff';
 	  var warning = 'padding: 2px; background: #f1e05a; color: #333333';
@@ -460,6 +473,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var types = { error: error, success: success, warning: warning };
 
 	  console.log('%c [Storage Helper] ' + text + ' ', types[type]);
+	};
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var debug = exports.debug = false;
+
+	var setDebug = exports.setDebug = function setDebug(value) {
+	  exports.debug = debug = value;
 	};
 
 /***/ }

@@ -42,3 +42,11 @@ import { clear } from 'storage-helper'
 
 clear()
 ```
+
+The logger is by default set to false, so if you want to see logs during development,
+you can just do like so
+```js
+import { showStorageLogger } from 'storage-helper'
+
+showStorageLogger(true)
+```

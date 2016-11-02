@@ -1,6 +1,7 @@
 import session from './session'
 import cookie from './cookie'
 import { log } from './utils'
+import { debug, setDebug } from './config'
 
 /**
  * Checks if cookies are blocked.
@@ -79,7 +80,7 @@ export const setItem = (key, value, persistency = true) => {
     const { code } = e
 
     if (code === 22 || code === 1014) {
-      log(`Quota exceeded for "${key}"!`, 'error')
+      log(`Quota exceeded for "${key}"!`, 'error', debug)
 
       // Let's try with cookies then!
       cookie.setItem(key, value)
@@ -111,9 +112,9 @@ export const getItem = (key, parsed = false) => {
     return parsed ? JSON.parse(result) : result
   } catch (e) {
     if (parsed) {
-      log(`Oops! Some problems parsing this ${typeof result}.`, 'error')
+      log(`Oops! Some problems parsing this ${typeof result}.`, 'error', debug)
     } else {
-      log(e, 'error')
+      log(e, 'error', debug)
     }
   }
 
@@ -147,6 +148,10 @@ export const removeItem = (key) => {
   }
 
   localstorage.removeItem(key)
+}
+
+export const showStorageLogger = (value) => {
+  setDebug(!!value)
 }
 
 /**
