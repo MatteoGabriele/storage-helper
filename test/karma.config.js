@@ -4,7 +4,7 @@ delete webpackConfig.entry
 
 module.exports = function (config) {
   config.set({
-    browsers: process.env.TRAVIS ? ['Chrome_travis_ci', 'SafariPrivate'] : ['SafariPrivate', 'Chrome'],
+    browsers: ['PhantomJS'],
     singleRun: false,
     frameworks: ['mocha', 'chai'],
     reporters: ['mocha'],
@@ -21,12 +21,6 @@ module.exports = function (config) {
         'karma-safari-private-launcher',
         'karma-sourcemap-loader'
     ],
-    customLaunchers: {
-        Chrome_travis_ci: {
-            base: 'Chrome',
-            flags: ['--no-sandbox']
-        }
-    },
     preprocessors: {
         './index.js': ['webpack', 'sourcemap']
     },
