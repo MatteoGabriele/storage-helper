@@ -5,8 +5,7 @@ delete webpackConfig.entry
 module.exports = function (config) {
   config.set({
     browsers: ['PhantomJS'],
-    singleRun: false,
-    autoWatch: process.env.TRAVIS ? false : true,
+    singleRun: true,
     frameworks: ['mocha', 'chai'],
     reporters: ['mocha'],
     files: [
