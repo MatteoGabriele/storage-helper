@@ -6,6 +6,7 @@ module.exports = function (config) {
   config.set({
     browsers: ['PhantomJS'],
     singleRun: false,
+    autoWatch: process.env.TRAVIS ? false : true,
     frameworks: ['mocha', 'chai'],
     reporters: ['mocha'],
     files: [
