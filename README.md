@@ -1,4 +1,5 @@
-# Storage Helper
+[![Build Status](https://travis-ci.org/MatteoGabriele/storage-helper.svg?branch=master)](https://travis-ci.org/MatteoGabriele/storage-helper)
+# Storage Helper 
 A very simple way to manage browser storage.
 
 If the browser doesn't support localStorage, data will be saved in a cookie.
