@@ -12,7 +12,7 @@ import { debug } from './config'
  */
 const setItem = (key, value, expires = 1) => {
   if (window.navigator && !window.navigator.cookieEnabled) {
-    session.set(key, value)
+    session.setItem(key, value)
     log(`I've saved "${key}" in a plain object :)`, 'warning', debug)
     return
   }
