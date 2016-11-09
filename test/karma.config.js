@@ -1,11 +1,12 @@
 var webpackConfig = require('../webpack.config.js');
+var isTravis = !!process.env.TRAVIS
 
 delete webpackConfig.entry
 
 module.exports = function (config) {
   config.set({
-    browsers: ['PhantomJS'],
-    singleRun: true,
+    browsers: isTravis ? ['PhantomJS'] : ['Chrome'],
+    singleRun: isTravis,
     frameworks: ['mocha', 'chai'],
     reporters: ['mocha'],
     files: [
@@ -18,7 +19,6 @@ module.exports = function (config) {
         'karma-webpack',
         'karma-mocha-reporter',
         'karma-chrome-launcher',
-        'karma-safari-private-launcher',
         'karma-sourcemap-loader'
     ],
     preprocessors: {
