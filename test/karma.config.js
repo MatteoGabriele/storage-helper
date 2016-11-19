@@ -1,11 +1,11 @@
-var webpackConfig = require('../webpack.config.js');
+var webpackConfig = require('../webpack/webpack.base.config');
 var isTravis = !!process.env.TRAVIS
 
 delete webpackConfig.entry
 
 module.exports = function (config) {
   config.set({
-    browsers: isTravis ? ['PhantomJS'] : ['Chrome'],
+    browsers: ['PhantomJS'],
     singleRun: isTravis,
     frameworks: ['mocha', 'chai'],
     reporters: ['mocha'],

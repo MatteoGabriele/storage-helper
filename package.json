@@ -8,8 +8,10 @@
     "url": "git+https://github.com/MatteoGabriele/storage-helper.git"
   },
   "scripts": {
-    "dev": "./node_modules/.bin/webpack -w",
-    "test": "karma start test/karma.config.js"
+    "dev": "webpack --config webpack/dev/webpack.config.js -w",
+    "build": "webpack --config webpack/prod/webpack.config.js",
+    "test": "karma start ./test/karma.config.js --singleRun",
+    "test:watch": "karma start ./test/karma.config.js"
   },
   "keywords": [
     "localStorage",
@@ -40,6 +42,7 @@
     "eslint-loader": "^1.6.0",
     "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
+    "js-cookie": "^2.1.3",
     "karma": "^1.3.0",
     "karma-babel-preprocessor": "^6.0.1",
     "karma-chai": "^0.1.0",
@@ -51,9 +54,9 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.8.0",
     "mocha": "^3.1.2",
-    "webpack": "^1.13.2"
+    "progress-bar-webpack-plugin": "^1.9.0",
+    "webpack": "^1.13.2",
+    "webpack-merge": "^0.17.0"
   },
-  "dependencies": {
-    "js-cookie": "^2.1.3"
-  }
+  "dependencies": {}
 }
