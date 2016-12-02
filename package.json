@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "webpack --config webpack/dev/webpack.config.js -w",
-    "build": "webpack --config webpack/prod/webpack.config.js",
+    "build": "rollup --config",
     "test": "karma start ./test/karma.config.js --singleRun",
     "test:watch": "karma start ./test/karma.config.js"
   },
@@ -32,6 +32,7 @@
     "babel-eslint": "^7.0.0",
     "babel-loader": "^6.2.5",
     "babel-preset-es2015": "^6.16.0",
+    "babel-preset-es2015-rollup": "^1.2.0",
     "babel-preset-stage-2": "^6.17.0",
     "babel-register": "^6.16.3",
     "chai": "^3.5.0",
@@ -42,7 +43,6 @@
     "eslint-loader": "^1.6.0",
     "eslint-plugin-promise": "^3.3.0",
     "eslint-plugin-standard": "^2.0.1",
-    "js-cookie": "^2.1.3",
     "karma": "1.3.0",
     "karma-babel-preprocessor": "^6.0.1",
     "karma-chai": "^0.1.0",
@@ -55,8 +55,13 @@
     "karma-webpack": "^1.8.0",
     "mocha": "^3.1.2",
     "progress-bar-webpack-plugin": "^1.9.0",
+    "rollup": "^0.36.4",
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-plugin-uglify": "^1.0.1",
     "webpack": "^1.13.2",
     "webpack-merge": "^0.17.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "js-cookie": "^2.1.3"
+  }
 }

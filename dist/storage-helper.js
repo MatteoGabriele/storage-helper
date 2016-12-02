@@ -1,99 +1,409 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('js-cookie')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'js-cookie'], factory) :
+  (factory((global.storageHelper = global.storageHelper || {}),global.cookie));
+}(this, (function (exports,cookie) { 'use strict';
 
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
+cookie = 'default' in cookie ? cookie['default'] : cookie;
 
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
-/******/ 			return installedModules[moduleId].exports;
+/**
+ * This will be our session storage in case of everything fails!
+ * First will try to use localStorage, then cookies and if we can't write
+ * that either, we're gonna store it here.
+ * @type {Array}
+ */
+var storage = [];
 
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
-/******/ 		};
+/**
+ * Add item in out session storage
+ * @param {String} key
+ * @param {String} value
+ */
+var setItem$1 = function setItem$1(key, value) {
+  storage[key] = typeof value === 'string' ? value : JSON.stringify(value);
+};
 
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/**
+ * Return the item from out session storage
+ * It will always returns a string so every data will be
+ * treated like it comes from the localStorage.
+ * @param  {String} key
+ * @return {String}
+ */
+var getItem$1 = function getItem$1(key) {
+  return storage[key] || null;
+};
 
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
+var clear$1 = function clear$1() {
+  storage = [];
+};
 
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
+/**
+ * Remove item from the session storage
+ * @param  {String}  key
+ */
+var removeItem$1 = function removeItem$1(key) {
+  if (!storage[key]) {
+    return;
+  }
+
+  delete storage[key];
+};
+
+var session = { setItem: setItem$1, getItem: getItem$1, removeItem: removeItem$1, clear: clear$1 };
+
+var debug = false;
+
+var setDebug = function setDebug(value) {
+  debug = value;
+};
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
 
 
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(1);
 
 
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
 
-	eval("'use strict';Object.defineProperty(exports, \"__esModule\", { value: true });exports.showStorageLogger = exports.removeItem = exports.clear = exports.getItem = exports.setItem = undefined;var _session = __webpack_require__(2);var _session2 = _interopRequireDefault(_session);\nvar _cookie = __webpack_require__(3);var _cookie2 = _interopRequireDefault(_cookie);\nvar _utils = __webpack_require__(5);\nvar _config = __webpack_require__(6);function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}\n\n\n\n\n\n\n\nvar localstorage = _utils.isCookieEnabled ? window.localStorage : undefined;\n\n\n\n\n\n\nvar checker = void 0;\n\n\n\n\n\nvar hasLocalStorage = function hasLocalStorage() {\n  if (!localstorage) {\n    checker = false;\n  }\n\n  if (typeof checker !== 'undefined') {\n    return checker;\n  }\n\n  try {\n    localstorage.setItem('0', '');\n    localstorage.removeItem('0');\n    checker = true;\n  } catch (e) {\n    checker = false;\n  }\n\n  return checker;\n};\n\n\n\n\n\n\n\n\n\n\n\n\n\nvar setItem = exports.setItem = function setItem(key, value) {var persistency = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;\n  if (!persistency) {\n    _session2.default.setItem(key, value);\n    return;\n  }\n\n  if (!hasLocalStorage()) {\n    _cookie2.default.setItem(key, value);\n    return;\n  }\n\n  try {\n    localstorage.setItem(key, value);\n  } catch (e) {var\n    code = e.code;\n\n    if (code === 22 || code === 1014) {\n      (0, _utils.log)('Quota exceeded for \"' + key + '\"!', 'error', _config.debug);\n\n\n      _cookie2.default.setItem(key, value);\n    }\n  }\n};\n\n\n\n\n\n\n\n\n\nvar getItem = exports.getItem = function getItem(key) {var parsed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;\n  var result = void 0;\n\n  var cookieItem = _cookie2.default.getItem(key);\n  var sessionItem = _session2.default.getItem(key);\n\n  if (!hasLocalStorage()) {\n    result = cookieItem || sessionItem;\n  } else {\n    result = localstorage.getItem(key) || cookieItem || sessionItem;\n  }\n\n  return parsed ? (0, _utils.parse)(result) : result;\n};\n\n\n\n\nvar clear = exports.clear = function clear() {\n  _cookie2.default.clear();\n  _session2.default.clear();\n\n  if (!hasLocalStorage()) {\n    return;\n  }\n\n  localstorage.clear();\n};\n\n\n\n\n\nvar removeItem = exports.removeItem = function removeItem(key) {\n  _cookie2.default.removeItem(key);\n  _session2.default.removeItem(key);\n\n  if (!hasLocalStorage()) {\n    return;\n  }\n\n  localstorage.removeItem(key);\n};\n\nvar showStorageLogger = exports.showStorageLogger = function showStorageLogger(value) {\n  (0, _config.setDebug)(!!value);\n};exports.default =\n\n\n\n\n{ setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguanM/OTU1MiJdLCJuYW1lcyI6WyJsb2NhbHN0b3JhZ2UiLCJ3aW5kb3ciLCJsb2NhbFN0b3JhZ2UiLCJ1bmRlZmluZWQiLCJjaGVja2VyIiwiaGFzTG9jYWxTdG9yYWdlIiwic2V0SXRlbSIsInJlbW92ZUl0ZW0iLCJlIiwia2V5IiwidmFsdWUiLCJwZXJzaXN0ZW5jeSIsImNvZGUiLCJnZXRJdGVtIiwicGFyc2VkIiwicmVzdWx0IiwiY29va2llSXRlbSIsInNlc3Npb25JdGVtIiwiY2xlYXIiLCJzaG93U3RvcmFnZUxvZ2dlciJdLCJtYXBwaW5ncyI6IjBMQUFBLHNDO0FBQ0EscUM7QUFDQTtBQUNBLHFDOzs7Ozs7OztBQVFBLElBQU1BLGVBQWUseUJBQWtCQyxPQUFPQyxZQUF6QixHQUF3Q0MsU0FBN0Q7Ozs7Ozs7QUFPQSxJQUFJQyxnQkFBSjs7Ozs7O0FBTUEsSUFBTUMsa0JBQWtCLFNBQWxCQSxlQUFrQixHQUFNO0FBQzVCLE1BQUksQ0FBQ0wsWUFBTCxFQUFtQjtBQUNqQkksY0FBVSxLQUFWO0FBQ0Q7O0FBRUQsTUFBSSxPQUFPQSxPQUFQLEtBQW1CLFdBQXZCLEVBQW9DO0FBQ2xDLFdBQU9BLE9BQVA7QUFDRDs7QUFFRCxNQUFJO0FBQ0ZKLGlCQUFhTSxPQUFiLENBQXFCLEdBQXJCLEVBQTBCLEVBQTFCO0FBQ0FOLGlCQUFhTyxVQUFiLENBQXdCLEdBQXhCO0FBQ0FILGNBQVUsSUFBVjtBQUNELEdBSkQsQ0FJRSxPQUFPSSxDQUFQLEVBQVU7QUFDVkosY0FBVSxLQUFWO0FBQ0Q7O0FBRUQsU0FBT0EsT0FBUDtBQUNELENBbEJEOzs7Ozs7Ozs7Ozs7OztBQWdDTyxJQUFNRSw0QkFBVSxTQUFWQSxPQUFVLENBQUNHLEdBQUQsRUFBTUMsS0FBTixFQUFvQyxLQUF2QkMsV0FBdUIsdUVBQVQsSUFBUztBQUN6RCxNQUFJLENBQUNBLFdBQUwsRUFBa0I7QUFDaEIsc0JBQVFMLE9BQVIsQ0FBZ0JHLEdBQWhCLEVBQXFCQyxLQUFyQjtBQUNBO0FBQ0Q7O0FBRUQsTUFBSSxDQUFDTCxpQkFBTCxFQUF3QjtBQUN0QixxQkFBT0MsT0FBUCxDQUFlRyxHQUFmLEVBQW9CQyxLQUFwQjtBQUNBO0FBQ0Q7O0FBRUQsTUFBSTtBQUNGVixpQkFBYU0sT0FBYixDQUFxQkcsR0FBckIsRUFBMEJDLEtBQTFCO0FBQ0QsR0FGRCxDQUVFLE9BQU9GLENBQVAsRUFBVTtBQUNGSSxRQURFLEdBQ09KLENBRFAsQ0FDRkksSUFERTs7QUFHVixRQUFJQSxTQUFTLEVBQVQsSUFBZUEsU0FBUyxJQUE1QixFQUFrQztBQUNoQywrQ0FBMkJILEdBQTNCLFNBQW9DLE9BQXBDOzs7QUFHQSx1QkFBT0gsT0FBUCxDQUFlRyxHQUFmLEVBQW9CQyxLQUFwQjtBQUNEO0FBQ0Y7QUFDRixDQXZCTTs7Ozs7Ozs7OztBQWlDQSxJQUFNRyw0QkFBVSxTQUFWQSxPQUFVLENBQUNKLEdBQUQsRUFBeUIsS0FBbkJLLE1BQW1CLHVFQUFWLEtBQVU7QUFDOUMsTUFBSUMsZUFBSjs7QUFFQSxNQUFNQyxhQUFhLGlCQUFPSCxPQUFQLENBQWVKLEdBQWYsQ0FBbkI7QUFDQSxNQUFNUSxjQUFjLGtCQUFRSixPQUFSLENBQWdCSixHQUFoQixDQUFwQjs7QUFFQSxNQUFJLENBQUNKLGlCQUFMLEVBQXdCO0FBQ3RCVSxhQUFTQyxjQUFjQyxXQUF2QjtBQUNELEdBRkQsTUFFTztBQUNMRixhQUFTZixhQUFhYSxPQUFiLENBQXFCSixHQUFyQixLQUE2Qk8sVUFBN0IsSUFBMkNDLFdBQXBEO0FBQ0Q7O0FBRUQsU0FBT0gsU0FBUyxrQkFBTUMsTUFBTixDQUFULEdBQXlCQSxNQUFoQztBQUNELENBYk07Ozs7O0FBa0JBLElBQU1HLHdCQUFRLFNBQVJBLEtBQVEsR0FBTTtBQUN6QixtQkFBT0EsS0FBUDtBQUNBLG9CQUFRQSxLQUFSOztBQUVBLE1BQUksQ0FBQ2IsaUJBQUwsRUFBd0I7QUFDdEI7QUFDRDs7QUFFREwsZUFBYWtCLEtBQWI7QUFDRCxDQVRNOzs7Ozs7QUFlQSxJQUFNWCxrQ0FBYSxTQUFiQSxVQUFhLENBQUNFLEdBQUQsRUFBUztBQUNqQyxtQkFBT0YsVUFBUCxDQUFrQkUsR0FBbEI7QUFDQSxvQkFBUUYsVUFBUixDQUFtQkUsR0FBbkI7O0FBRUEsTUFBSSxDQUFDSixpQkFBTCxFQUF3QjtBQUN0QjtBQUNEOztBQUVETCxlQUFhTyxVQUFiLENBQXdCRSxHQUF4QjtBQUNELENBVE07O0FBV0EsSUFBTVUsZ0RBQW9CLFNBQXBCQSxpQkFBb0IsQ0FBQ1QsS0FBRCxFQUFXO0FBQzFDLHdCQUFTLENBQUMsQ0FBQ0EsS0FBWDtBQUNELENBRk0sQzs7Ozs7QUFPUSxFQUFFSixnQkFBRixFQUFXTyxnQkFBWCxFQUFvQk4sc0JBQXBCLEVBQWdDVyxZQUFoQyxFIiwiZmlsZSI6IjEuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgc2Vzc2lvbiBmcm9tICcuL3Nlc3Npb24nXG5pbXBvcnQgY29va2llIGZyb20gJy4vY29va2llJ1xuaW1wb3J0IHsgbG9nLCBpc0Nvb2tpZUVuYWJsZWQsIHBhcnNlIH0gZnJvbSAnLi91dGlscydcbmltcG9ydCB7IGRlYnVnLCBzZXREZWJ1ZyB9IGZyb20gJy4vY29uZmlnJ1xuXG4vKipcbiAqIFJlZmVyZW5jZSB0byB0aGUgbG9jYWxTdG9yYWdlIG9iamVjdFxuICogQXBwYXJlbnRseSBTYWZhcmkgZG9lc24ndCB3YW50IHRvIGV2ZW4gdHJ5IHRvIGNoZWNrIGlmIHRoZSBsb2NhbFN0b3JhZ2VcbiAqIGV4aXN0cywgc28gd2UncmUgbm90IGdvbm5hIHRvdWNoIGl0IGlmIGNvb2tpZXMgYXJlIGJsb2NrZWQgaW4gZmlyc3QgcGxhY2UuXG4gKiBAdHlwZSB7TG9jYWxTdG9yYWdlfVxuICovXG5jb25zdCBsb2NhbHN0b3JhZ2UgPSBpc0Nvb2tpZUVuYWJsZWQgPyB3aW5kb3cubG9jYWxTdG9yYWdlIDogdW5kZWZpbmVkXG5cbi8qKlxuICogVG8gYXZvaWQgdGhlIHRyeS9jYXRjaCB0byBiZSBjYWxsZWQgbXVsdGlwbGUgdGltZXMsIHRoZSB2YWx1ZVxuICogb2YgdGhlIGNoZWNrIGlzIGdvbm5hIGJlIHN0b3JlZCBoZXJlLlxuICogQHR5cGUge0Jvb2xlYW59XG4gKi9cbmxldCBjaGVja2VyXG5cbi8qKlxuICogTG9jYWxTdG9yYWdlIGNoZWNrXG4gKiBAcmV0dXJuIHtCb29sZWFufVxuICovXG5jb25zdCBoYXNMb2NhbFN0b3JhZ2UgPSAoKSA9PiB7XG4gIGlmICghbG9jYWxzdG9yYWdlKSB7XG4gICAgY2hlY2tlciA9IGZhbHNlXG4gIH1cblxuICBpZiAodHlwZW9mIGNoZWNrZXIgIT09ICd1bmRlZmluZWQnKSB7XG4gICAgcmV0dXJuIGNoZWNrZXJcbiAgfVxuXG4gIHRyeSB7XG4gICAgbG9jYWxzdG9yYWdlLnNldEl0ZW0oJzAnLCAnJylcbiAgICBsb2NhbHN0b3JhZ2UucmVtb3ZlSXRlbSgnMCcpXG4gICAgY2hlY2tlciA9IHRydWVcbiAgfSBjYXRjaCAoZSkge1xuICAgIGNoZWNrZXIgPSBmYWxzZVxuICB9XG5cbiAgcmV0dXJuIGNoZWNrZXJcbn1cblxuLyoqXG4gKiBTZXQgdGhlIGl0ZW0uXG4gKiBIZXJlIGRhdGEgd2lsbCBiZSBzYXZlZCBpbiB0aGUgTG9jYWxTdG9yYWdlIGlmIGl0IGRvZXNuJ3QgZXhpc3QsIG90aGVyd2lzZSB3ZSdsbFxuICogdHJ5IGNvb2tpZXMgYW5kIGlmIHdlJ3JlIG5vdCBpbiBhIGx1Y2t5IGRheSwgZGF0YSB3aWxsIGJlIHN0b3JlZCBpbiBhIHBsYWluIG9iamVjdC5cbiAqXG4gKiBBbiBleHRyYSBjaGVjayBpcyBkb25lIGhlcmUgZm9yIHRoZSBRdW90YUV4Y2VlZGVkRXJyb3IuXG4gKiBJJ2xsIHRyeSB0byBzYXZlIGRhdGEgYW5kIGp1c3Qgc2lsZW50bHkgd2FybmluZyBpdFxuICogaW4gdGhlIGNvbnNvbGUsIHNvIGFsc28gcmVhbC10aW1lIGVycm9yIHRyYWNraW5nIHRvb2xzIHdvbid0IHN0cmVzcyB0b28gbXVjaC5cbiAqIEBwYXJhbSB7U3RyaW5nfSAga2V5XG4gKiBAcGFyYW0ge1N0cmluZ30gIHZhbHVlXG4gKiBAcGFyYW0ge0Jvb2xlYW59IFtwZXJzaXN0ZW5jeT10cnVlXVxuICovXG5leHBvcnQgY29uc3Qgc2V0SXRlbSA9IChrZXksIHZhbHVlLCBwZXJzaXN0ZW5jeSA9IHRydWUpID0+IHtcbiAgaWYgKCFwZXJzaXN0ZW5jeSkge1xuICAgIHNlc3Npb24uc2V0SXRlbShrZXksIHZhbHVlKVxuICAgIHJldHVyblxuICB9XG5cbiAgaWYgKCFoYXNMb2NhbFN0b3JhZ2UoKSkge1xuICAgIGNvb2tpZS5zZXRJdGVtKGtleSwgdmFsdWUpXG4gICAgcmV0dXJuXG4gIH1cblxuICB0cnkge1xuICAgIGxvY2Fsc3RvcmFnZS5zZXRJdGVtKGtleSwgdmFsdWUpXG4gIH0gY2F0Y2ggKGUpIHtcbiAgICBjb25zdCB7IGNvZGUgfSA9IGVcblxuICAgIGlmIChjb2RlID09PSAyMiB8fCBjb2RlID09PSAxMDE0KSB7XG4gICAgICBsb2coYFF1b3RhIGV4Y2VlZGVkIGZvciBcIiR7a2V5fVwiIWAsICdlcnJvcicsIGRlYnVnKVxuXG4gICAgICAvLyBMZXQncyB0cnkgd2l0aCBjb29raWVzIHRoZW4hXG4gICAgICBjb29raWUuc2V0SXRlbShrZXksIHZhbHVlKVxuICAgIH1cbiAgfVxufVxuXG4vKipcbiAqIEdldCB0aGUgaXRlbVxuICogSGVyZSB0aGUgb2JqZWN0IGlzIHRha2VuIGZyb20gdGhlIGxvY2FsU3RvcmFnZSBpZiBpdCB3YXMgYXZhaWxhYmxlLFxuICogb3IgZnJvbSB0aGUgb2JqZWN0IGlmIHdhc24ndCBwb3NzaWJsZSBvciBpZiBzaW1wbGUgd2Fzbid0IHNhdmVkIHBlcm1hbmVudGx5XG4gKiBAcGFyYW0gIHtTdHJpbmd9ICBrZXlcbiAqIEBwYXJhbSAge0Jvb2xlYW59IFtwYXJzZWQ9ZmFsc2VdXG4gKiBAcmV0dXJuIHthbnl9XG4gKi9cbmV4cG9ydCBjb25zdCBnZXRJdGVtID0gKGtleSwgcGFyc2VkID0gZmFsc2UpID0+IHtcbiAgbGV0IHJlc3VsdFxuXG4gIGNvbnN0IGNvb2tpZUl0ZW0gPSBjb29raWUuZ2V0SXRlbShrZXkpXG4gIGNvbnN0IHNlc3Npb25JdGVtID0gc2Vzc2lvbi5nZXRJdGVtKGtleSlcblxuICBpZiAoIWhhc0xvY2FsU3RvcmFnZSgpKSB7XG4gICAgcmVzdWx0ID0gY29va2llSXRlbSB8fCBzZXNzaW9uSXRlbVxuICB9IGVsc2Uge1xuICAgIHJlc3VsdCA9IGxvY2Fsc3RvcmFnZS5nZXRJdGVtKGtleSkgfHwgY29va2llSXRlbSB8fCBzZXNzaW9uSXRlbVxuICB9XG5cbiAgcmV0dXJuIHBhcnNlZCA/IHBhcnNlKHJlc3VsdCkgOiByZXN1bHRcbn1cblxuLyoqXG4gKiBDbGVhciBhbGwgc3RvcmFnZVxuICovXG5leHBvcnQgY29uc3QgY2xlYXIgPSAoKSA9PiB7XG4gIGNvb2tpZS5jbGVhcigpXG4gIHNlc3Npb24uY2xlYXIoKVxuXG4gIGlmICghaGFzTG9jYWxTdG9yYWdlKCkpIHtcbiAgICByZXR1cm5cbiAgfVxuXG4gIGxvY2Fsc3RvcmFnZS5jbGVhcigpXG59XG5cbi8qKlxuICogUmVtb3ZlIGEgc2luZ2xlIGl0ZW0gZnJvbSB0aGUgc3RvcmFnZVxuICogQHBhcmFtICB7U3RyaW5nfSAga2V5XG4gKi9cbmV4cG9ydCBjb25zdCByZW1vdmVJdGVtID0gKGtleSkgPT4ge1xuICBjb29raWUucmVtb3ZlSXRlbShrZXkpXG4gIHNlc3Npb24ucmVtb3ZlSXRlbShrZXkpXG5cbiAgaWYgKCFoYXNMb2NhbFN0b3JhZ2UoKSkge1xuICAgIHJldHVyblxuICB9XG5cbiAgbG9jYWxzdG9yYWdlLnJlbW92ZUl0ZW0oa2V5KVxufVxuXG5leHBvcnQgY29uc3Qgc2hvd1N0b3JhZ2VMb2dnZXIgPSAodmFsdWUpID0+IHtcbiAgc2V0RGVidWcoISF2YWx1ZSlcbn1cblxuLyoqXG4gKiBFeHBvcnRzIGFsbCBmZWF0dXJlcywgc28gd2lsbCBiZSBwb3NzaWJsZSB0byB1c2UgaXQgYXMgYW4gb2JqZWN0IGFzIHdlbGxcbiAqL1xuZXhwb3J0IGRlZmF1bHQgeyBzZXRJdGVtLCBnZXRJdGVtLCByZW1vdmVJdGVtLCBjbGVhciB9XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gLi9zcmMvaW5kZXguanMiXSwic291cmNlUm9vdCI6IiJ9");
 
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
 
-	eval("'use strict';Object.defineProperty(exports, \"__esModule\", { value: true });\n\n\n\n\n\nvar storage = [];\n\n\n\n\n\n\nvar setItem = function setItem(key, value) {\n  storage[key] = typeof value === 'string' ? value : JSON.stringify(value);\n};\n\n\n\n\n\n\n\n\nvar getItem = function getItem(key) {\n  return storage[key] || null;\n};\n\nvar clear = function clear() {\n  storage = [];\n};\n\n\n\n\n\nvar removeItem = function removeItem(key) {\n  if (!storage[key]) {\n    return;\n  }\n\n  delete storage[key];\n};exports.default =\n\n{ setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvc2Vzc2lvbi5qcz85ZmMwIl0sIm5hbWVzIjpbInN0b3JhZ2UiLCJzZXRJdGVtIiwia2V5IiwidmFsdWUiLCJKU09OIiwic3RyaW5naWZ5IiwiZ2V0SXRlbSIsImNsZWFyIiwicmVtb3ZlSXRlbSJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBTUEsSUFBSUEsVUFBVSxFQUFkOzs7Ozs7O0FBT0EsSUFBTUMsVUFBVSxTQUFWQSxPQUFVLENBQUNDLEdBQUQsRUFBTUMsS0FBTixFQUFnQjtBQUM5QkgsVUFBUUUsR0FBUixJQUFlLE9BQU9DLEtBQVAsS0FBaUIsUUFBakIsR0FBNEJBLEtBQTVCLEdBQW9DQyxLQUFLQyxTQUFMLENBQWVGLEtBQWYsQ0FBbkQ7QUFDRCxDQUZEOzs7Ozs7Ozs7QUFXQSxJQUFNRyxVQUFVLFNBQVZBLE9BQVUsQ0FBQ0osR0FBRCxFQUFTO0FBQ3ZCLFNBQU9GLFFBQVFFLEdBQVIsS0FBZ0IsSUFBdkI7QUFDRCxDQUZEOztBQUlBLElBQU1LLFFBQVEsU0FBUkEsS0FBUSxHQUFNO0FBQ2xCUCxZQUFVLEVBQVY7QUFDRCxDQUZEOzs7Ozs7QUFRQSxJQUFNUSxhQUFhLFNBQWJBLFVBQWEsQ0FBQ04sR0FBRCxFQUFTO0FBQzFCLE1BQUksQ0FBQ0YsUUFBUUUsR0FBUixDQUFMLEVBQW1CO0FBQ2pCO0FBQ0Q7O0FBRUQsU0FBT0YsUUFBUUUsR0FBUixDQUFQO0FBQ0QsQ0FORCxDOztBQVFlLEVBQUVELGdCQUFGLEVBQVdLLGdCQUFYLEVBQW9CRSxzQkFBcEIsRUFBZ0NELFlBQWhDLEUiLCJmaWxlIjoiMi5qcyIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogVGhpcyB3aWxsIGJlIG91ciBzZXNzaW9uIHN0b3JhZ2UgaW4gY2FzZSBvZiBldmVyeXRoaW5nIGZhaWxzIVxuICogRmlyc3Qgd2lsbCB0cnkgdG8gdXNlIGxvY2FsU3RvcmFnZSwgdGhlbiBjb29raWVzIGFuZCBpZiB3ZSBjYW4ndCB3cml0ZVxuICogdGhhdCBlaXRoZXIsIHdlJ3JlIGdvbm5hIHN0b3JlIGl0IGhlcmUuXG4gKiBAdHlwZSB7QXJyYXl9XG4gKi9cbmxldCBzdG9yYWdlID0gW11cblxuLyoqXG4gKiBBZGQgaXRlbSBpbiBvdXQgc2Vzc2lvbiBzdG9yYWdlXG4gKiBAcGFyYW0ge1N0cmluZ30ga2V5XG4gKiBAcGFyYW0ge1N0cmluZ30gdmFsdWVcbiAqL1xuY29uc3Qgc2V0SXRlbSA9IChrZXksIHZhbHVlKSA9PiB7XG4gIHN0b3JhZ2Vba2V5XSA9IHR5cGVvZiB2YWx1ZSA9PT0gJ3N0cmluZycgPyB2YWx1ZSA6IEpTT04uc3RyaW5naWZ5KHZhbHVlKVxufVxuXG4vKipcbiAqIFJldHVybiB0aGUgaXRlbSBmcm9tIG91dCBzZXNzaW9uIHN0b3JhZ2VcbiAqIEl0IHdpbGwgYWx3YXlzIHJldHVybnMgYSBzdHJpbmcgc28gZXZlcnkgZGF0YSB3aWxsIGJlXG4gKiB0cmVhdGVkIGxpa2UgaXQgY29tZXMgZnJvbSB0aGUgbG9jYWxTdG9yYWdlLlxuICogQHBhcmFtICB7U3RyaW5nfSBrZXlcbiAqIEByZXR1cm4ge1N0cmluZ31cbiAqL1xuY29uc3QgZ2V0SXRlbSA9IChrZXkpID0+IHtcbiAgcmV0dXJuIHN0b3JhZ2Vba2V5XSB8fCBudWxsXG59XG5cbmNvbnN0IGNsZWFyID0gKCkgPT4ge1xuICBzdG9yYWdlID0gW11cbn1cblxuLyoqXG4gKiBSZW1vdmUgaXRlbSBmcm9tIHRoZSBzZXNzaW9uIHN0b3JhZ2VcbiAqIEBwYXJhbSAge1N0cmluZ30gIGtleVxuICovXG5jb25zdCByZW1vdmVJdGVtID0gKGtleSkgPT4ge1xuICBpZiAoIXN0b3JhZ2Vba2V5XSkge1xuICAgIHJldHVyblxuICB9XG5cbiAgZGVsZXRlIHN0b3JhZ2Vba2V5XVxufVxuXG5leHBvcnQgZGVmYXVsdCB7IHNldEl0ZW0sIGdldEl0ZW0sIHJlbW92ZUl0ZW0sIGNsZWFyIH1cblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyAuL3NyYy9zZXNzaW9uLmpzIl0sInNvdXJjZVJvb3QiOiIifQ==");
 
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
 
-	eval("'use strict';Object.defineProperty(exports, \"__esModule\", { value: true });var _session = __webpack_require__(2);var _session2 = _interopRequireDefault(_session);\nvar _jsCookie = __webpack_require__(4);var _jsCookie2 = _interopRequireDefault(_jsCookie);\nvar _utils = __webpack_require__(5);\nvar _config = __webpack_require__(6);function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}\n\n\n\n\n\n\n\n\nvar setItem = function setItem(key, value) {var expires = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;\n  if (!_utils.isCookieEnabled) {\n    _session2.default.setItem(key, value);\n    (0, _utils.log)('I\\'ve saved \"' + key + '\" in a plain object :)', 'warning', _config.debug);\n    return;\n  }\n\n  _jsCookie2.default.set(key, value, { expires: expires });\n  (0, _utils.log)('I\\'ve saved \"' + key + '\" in a cookie :)', 'warning', _config.debug);\n};\n\n\n\n\n\n\nvar getItem = function getItem(key) {\n  return _jsCookie2.default.get(key);\n};\n\n\n\n\n\nvar removeItem = function removeItem(key) {\n  _jsCookie2.default.remove(key);\n};\n\n\n\n\nvar clear = function clear() {\n  var cookies = _utils.isBrowser && document.cookie.split(';');\n\n  if (!cookies.length) {\n    return;\n  }\n\n  for (var i = 0, l = cookies.length; i < l; i++) {\n    var item = cookies[i];\n    var key = item.split('=')[0];\n\n    _jsCookie2.default.remove(key);\n  }\n};exports.default =\n\n{ setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvY29va2llLmpzPzA0ZTUiXSwibmFtZXMiOlsic2V0SXRlbSIsImtleSIsInZhbHVlIiwiZXhwaXJlcyIsInNldCIsImdldEl0ZW0iLCJnZXQiLCJyZW1vdmVJdGVtIiwicmVtb3ZlIiwiY2xlYXIiLCJjb29raWVzIiwiZG9jdW1lbnQiLCJjb29raWUiLCJzcGxpdCIsImxlbmd0aCIsImkiLCJsIiwiaXRlbSJdLCJtYXBwaW5ncyI6IjJFQUFBLHNDO0FBQ0EsdUM7QUFDQTtBQUNBLHFDOzs7Ozs7Ozs7QUFTQSxJQUFNQSxVQUFVLFNBQVZBLE9BQVUsQ0FBQ0MsR0FBRCxFQUFNQyxLQUFOLEVBQTZCLEtBQWhCQyxPQUFnQix1RUFBTixDQUFNO0FBQzNDLE1BQUksdUJBQUosRUFBc0I7QUFDcEIsc0JBQVFILE9BQVIsQ0FBZ0JDLEdBQWhCLEVBQXFCQyxLQUFyQjtBQUNBLHNDQUFtQkQsR0FBbkIsNkJBQWdELFNBQWhEO0FBQ0E7QUFDRDs7QUFFRCxxQkFBT0csR0FBUCxDQUFXSCxHQUFYLEVBQWdCQyxLQUFoQixFQUF1QixFQUFFQyxnQkFBRixFQUF2QjtBQUNBLG9DQUFtQkYsR0FBbkIsdUJBQTBDLFNBQTFDO0FBQ0QsQ0FURDs7Ozs7OztBQWdCQSxJQUFNSSxVQUFVLFNBQVZBLE9BQVUsQ0FBQ0osR0FBRCxFQUFTO0FBQ3ZCLFNBQU8sbUJBQU9LLEdBQVAsQ0FBV0wsR0FBWCxDQUFQO0FBQ0QsQ0FGRDs7Ozs7O0FBUUEsSUFBTU0sYUFBYSxTQUFiQSxVQUFhLENBQUNOLEdBQUQsRUFBUztBQUMxQixxQkFBT08sTUFBUCxDQUFjUCxHQUFkO0FBQ0QsQ0FGRDs7Ozs7QUFPQSxJQUFNUSxRQUFRLFNBQVJBLEtBQVEsR0FBTTtBQUNsQixNQUFNQyxVQUFVLG9CQUFhQyxTQUFTQyxNQUFULENBQWdCQyxLQUFoQixDQUFzQixHQUF0QixDQUE3Qjs7QUFFQSxNQUFJLENBQUNILFFBQVFJLE1BQWIsRUFBcUI7QUFDbkI7QUFDRDs7QUFFRCxPQUFLLElBQUlDLElBQUksQ0FBUixFQUFXQyxJQUFJTixRQUFRSSxNQUE1QixFQUFvQ0MsSUFBSUMsQ0FBeEMsRUFBMkNELEdBQTNDLEVBQWdEO0FBQzlDLFFBQU1FLE9BQU9QLFFBQVFLLENBQVIsQ0FBYjtBQUNBLFFBQU1kLE1BQU1nQixLQUFLSixLQUFMLENBQVcsR0FBWCxFQUFnQixDQUFoQixDQUFaOztBQUVBLHVCQUFPTCxNQUFQLENBQWNQLEdBQWQ7QUFDRDtBQUNGLENBYkQsQzs7QUFlZSxFQUFFRCxnQkFBRixFQUFXSyxnQkFBWCxFQUFvQkUsc0JBQXBCLEVBQWdDRSxZQUFoQyxFIiwiZmlsZSI6IjMuanMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgc2Vzc2lvbiBmcm9tICcuL3Nlc3Npb24nXG5pbXBvcnQgY29va2llIGZyb20gJ2pzLWNvb2tpZSdcbmltcG9ydCB7IGxvZywgaXNDb29raWVFbmFibGVkLCBpc0Jyb3dzZXIgfSBmcm9tICcuL3V0aWxzJ1xuaW1wb3J0IHsgZGVidWcgfSBmcm9tICcuL2NvbmZpZydcblxuLyoqXG4gKiBTZXQgdGhlIGl0ZW0gaW4gdGhlIGNvb2tpZXMgaWYgcG9zc2libGUsIG90aGVyd2lzZSBpcyBnb2luZyB0byBzdG9yZSBpdFxuICogaW5zaWRlIGEgcGxhaW4gb2JqZWN0XG4gKiBAcGFyYW0ge1N0cmluZ30ga2V5XG4gKiBAcGFyYW0ge1N0cmluZ30gdmFsdWVcbiAqIEBwYXJhbSB7TnVtYmVyfSBbZXhwaXJlcz0xXVxuICovXG5jb25zdCBzZXRJdGVtID0gKGtleSwgdmFsdWUsIGV4cGlyZXMgPSAxKSA9PiB7XG4gIGlmICghaXNDb29raWVFbmFibGVkKSB7XG4gICAgc2Vzc2lvbi5zZXRJdGVtKGtleSwgdmFsdWUpXG4gICAgbG9nKGBJJ3ZlIHNhdmVkIFwiJHtrZXl9XCIgaW4gYSBwbGFpbiBvYmplY3QgOilgLCAnd2FybmluZycsIGRlYnVnKVxuICAgIHJldHVyblxuICB9XG5cbiAgY29va2llLnNldChrZXksIHZhbHVlLCB7IGV4cGlyZXMgfSlcbiAgbG9nKGBJJ3ZlIHNhdmVkIFwiJHtrZXl9XCIgaW4gYSBjb29raWUgOilgLCAnd2FybmluZycsIGRlYnVnKVxufVxuXG4vKipcbiAqIEdldCB2YWx1ZSBmcm9tIGEgY29va2llXG4gKiBAcGFyYW0gIHtTdHJpbmd9IGtleVxuICogQHJldHVybiB7U3RyaW5nfVxuICovXG5jb25zdCBnZXRJdGVtID0gKGtleSkgPT4ge1xuICByZXR1cm4gY29va2llLmdldChrZXkpXG59XG5cbi8qKlxuICogUmVtb3ZlIGNvb2tpZVxuICogQHBhcmFtICB7U3RyaW5nfSBrZXkgW2Rlc2NyaXB0aW9uXVxuICovXG5jb25zdCByZW1vdmVJdGVtID0gKGtleSkgPT4ge1xuICBjb29raWUucmVtb3ZlKGtleSlcbn1cblxuLyoqXG4gKiBSZW1vdmUgYWxsIGNvb2tpZXNcbiAqL1xuY29uc3QgY2xlYXIgPSAoKSA9PiB7XG4gIGNvbnN0IGNvb2tpZXMgPSBpc0Jyb3dzZXIgJiYgZG9jdW1lbnQuY29va2llLnNwbGl0KCc7JylcblxuICBpZiAoIWNvb2tpZXMubGVuZ3RoKSB7XG4gICAgcmV0dXJuXG4gIH1cblxuICBmb3IgKGxldCBpID0gMCwgbCA9IGNvb2tpZXMubGVuZ3RoOyBpIDwgbDsgaSsrKSB7XG4gICAgY29uc3QgaXRlbSA9IGNvb2tpZXNbaV1cbiAgICBjb25zdCBrZXkgPSBpdGVtLnNwbGl0KCc9JylbMF1cblxuICAgIGNvb2tpZS5yZW1vdmUoa2V5KVxuICB9XG59XG5cbmV4cG9ydCBkZWZhdWx0IHsgc2V0SXRlbSwgZ2V0SXRlbSwgcmVtb3ZlSXRlbSwgY2xlYXIgfVxuXG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIC4vc3JjL2Nvb2tpZS5qcyJdLCJzb3VyY2VSb290IjoiIn0=");
 
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
 
-	eval("var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!\n * JavaScript Cookie v2.1.3\n * https://github.com/js-cookie/js-cookie\n *\n * Copyright 2006, 2015 Klaus Hartl & Fagner Brack\n * Released under the MIT license\n */\n;(function (factory) {\n\tvar registeredInModuleLoader = false;\n\tif (true) {\n\t\t!(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));\n\t\tregisteredInModuleLoader = true;\n\t}\n\tif (true) {\n\t\tmodule.exports = factory();\n\t\tregisteredInModuleLoader = true;\n\t}\n\tif (!registeredInModuleLoader) {\n\t\tvar OldCookies = window.Cookies;\n\t\tvar api = window.Cookies = factory();\n\t\tapi.noConflict = function () {\n\t\t\twindow.Cookies = OldCookies;\n\t\t\treturn api;\n\t\t};\n\t}\n}(function () {\n\tfunction extend () {\n\t\tvar i = 0;\n\t\tvar result = {};\n\t\tfor (; i < arguments.length; i++) {\n\t\t\tvar attributes = arguments[ i ];\n\t\t\tfor (var key in attributes) {\n\t\t\t\tresult[key] = attributes[key];\n\t\t\t}\n\t\t}\n\t\treturn result;\n\t}\n\n\tfunction init (converter) {\n\t\tfunction api (key, value, attributes) {\n\t\t\tvar result;\n\t\t\tif (typeof document === 'undefined') {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\t// Write\n\n\t\t\tif (arguments.length > 1) {\n\t\t\t\tattributes = extend({\n\t\t\t\t\tpath: '/'\n\t\t\t\t}, api.defaults, attributes);\n\n\t\t\t\tif (typeof attributes.expires === 'number') {\n\t\t\t\t\tvar expires = new Date();\n\t\t\t\t\texpires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);\n\t\t\t\t\tattributes.expires = expires;\n\t\t\t\t}\n\n\t\t\t\ttry {\n\t\t\t\t\tresult = JSON.stringify(value);\n\t\t\t\t\tif (/^[\\{\\[]/.test(result)) {\n\t\t\t\t\t\tvalue = result;\n\t\t\t\t\t}\n\t\t\t\t} catch (e) {}\n\n\t\t\t\tif (!converter.write) {\n\t\t\t\t\tvalue = encodeURIComponent(String(value))\n\t\t\t\t\t\t.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);\n\t\t\t\t} else {\n\t\t\t\t\tvalue = converter.write(value, key);\n\t\t\t\t}\n\n\t\t\t\tkey = encodeURIComponent(String(key));\n\t\t\t\tkey = key.replace(/%(23|24|26|2B|5E|60|7C)/g, decodeURIComponent);\n\t\t\t\tkey = key.replace(/[\\(\\)]/g, escape);\n\n\t\t\t\treturn (document.cookie = [\n\t\t\t\t\tkey, '=', value,\n\t\t\t\t\tattributes.expires ? '; expires=' + attributes.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE\n\t\t\t\t\tattributes.path ? '; path=' + attributes.path : '',\n\t\t\t\t\tattributes.domain ? '; domain=' + attributes.domain : '',\n\t\t\t\t\tattributes.secure ? '; secure' : ''\n\t\t\t\t].join(''));\n\t\t\t}\n\n\t\t\t// Read\n\n\t\t\tif (!key) {\n\t\t\t\tresult = {};\n\t\t\t}\n\n\t\t\t// To prevent the for loop in the first place assign an empty array\n\t\t\t// in case there are no cookies at all. Also prevents odd result when\n\t\t\t// calling \"get()\"\n\t\t\tvar cookies = document.cookie ? document.cookie.split('; ') : [];\n\t\t\tvar rdecode = /(%[0-9A-Z]{2})+/g;\n\t\t\tvar i = 0;\n\n\t\t\tfor (; i < cookies.length; i++) {\n\t\t\t\tvar parts = cookies[i].split('=');\n\t\t\t\tvar cookie = parts.slice(1).join('=');\n\n\t\t\t\tif (cookie.charAt(0) === '\"') {\n\t\t\t\t\tcookie = cookie.slice(1, -1);\n\t\t\t\t}\n\n\t\t\t\ttry {\n\t\t\t\t\tvar name = parts[0].replace(rdecode, decodeURIComponent);\n\t\t\t\t\tcookie = converter.read ?\n\t\t\t\t\t\tconverter.read(cookie, name) : converter(cookie, name) ||\n\t\t\t\t\t\tcookie.replace(rdecode, decodeURIComponent);\n\n\t\t\t\t\tif (this.json) {\n\t\t\t\t\t\ttry {\n\t\t\t\t\t\t\tcookie = JSON.parse(cookie);\n\t\t\t\t\t\t} catch (e) {}\n\t\t\t\t\t}\n\n\t\t\t\t\tif (key === name) {\n\t\t\t\t\t\tresult = cookie;\n\t\t\t\t\t\tbreak;\n\t\t\t\t\t}\n\n\t\t\t\t\tif (!key) {\n\t\t\t\t\t\tresult[name] = cookie;\n\t\t\t\t\t}\n\t\t\t\t} catch (e) {}\n\t\t\t}\n\n\t\t\treturn result;\n\t\t}\n\n\t\tapi.set = api;\n\t\tapi.get = function (key) {\n\t\t\treturn api.call(api, key);\n\t\t};\n\t\tapi.getJSON = function () {\n\t\t\treturn api.apply({\n\t\t\t\tjson: true\n\t\t\t}, [].slice.call(arguments));\n\t\t};\n\t\tapi.defaults = {};\n\n\t\tapi.remove = function (key, attributes) {\n\t\t\tapi(key, '', extend(attributes, {\n\t\t\t\texpires: -1\n\t\t\t}));\n\t\t};\n\n\t\tapi.withConverter = init;\n\n\t\treturn api;\n\t}\n\n\treturn init(function () {});\n}));\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9+L2pzLWNvb2tpZS9zcmMvanMuY29va2llLmpzPzY0OGEiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxDQUFDO0FBQ0Q7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLENBQUM7QUFDRDtBQUNBO0FBQ0E7QUFDQSxRQUFRLHNCQUFzQjtBQUM5QjtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FBRUE7O0FBRUE7QUFDQTtBQUNBO0FBQ0EsS0FBSzs7QUFFTDtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQSxjQUFjO0FBQ2Q7QUFDQTtBQUNBLEtBQUs7O0FBRUw7QUFDQTtBQUNBO0FBQ0EsS0FBSztBQUNMO0FBQ0E7O0FBRUE7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQSw0QkFBNEI7QUFDNUIseUJBQXlCO0FBQ3pCLDJCQUEyQjtBQUMzQiwyQkFBMkI7QUFDM0I7QUFDQTs7QUFFQTs7QUFFQTtBQUNBO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0EsMkRBQTJEO0FBQzNELDZCQUE2QixFQUFFO0FBQy9COztBQUVBLFNBQVMsb0JBQW9CO0FBQzdCO0FBQ0E7O0FBRUE7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0EsT0FBTztBQUNQOztBQUVBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBLEtBQUs7QUFDTDs7QUFFQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsSUFBSTtBQUNKO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0EsSUFBSTtBQUNKOztBQUVBOztBQUVBO0FBQ0E7O0FBRUEsMkJBQTJCO0FBQzNCLENBQUMiLCJmaWxlIjoiNC5qcyIsInNvdXJjZXNDb250ZW50IjpbIi8qIVxuICogSmF2YVNjcmlwdCBDb29raWUgdjIuMS4zXG4gKiBodHRwczovL2dpdGh1Yi5jb20vanMtY29va2llL2pzLWNvb2tpZVxuICpcbiAqIENvcHlyaWdodCAyMDA2LCAyMDE1IEtsYXVzIEhhcnRsICYgRmFnbmVyIEJyYWNrXG4gKiBSZWxlYXNlZCB1bmRlciB0aGUgTUlUIGxpY2Vuc2VcbiAqL1xuOyhmdW5jdGlvbiAoZmFjdG9yeSkge1xuXHR2YXIgcmVnaXN0ZXJlZEluTW9kdWxlTG9hZGVyID0gZmFsc2U7XG5cdGlmICh0eXBlb2YgZGVmaW5lID09PSAnZnVuY3Rpb24nICYmIGRlZmluZS5hbWQpIHtcblx0XHRkZWZpbmUoZmFjdG9yeSk7XG5cdFx0cmVnaXN0ZXJlZEluTW9kdWxlTG9hZGVyID0gdHJ1ZTtcblx0fVxuXHRpZiAodHlwZW9mIGV4cG9ydHMgPT09ICdvYmplY3QnKSB7XG5cdFx0bW9kdWxlLmV4cG9ydHMgPSBmYWN0b3J5KCk7XG5cdFx0cmVnaXN0ZXJlZEluTW9kdWxlTG9hZGVyID0gdHJ1ZTtcblx0fVxuXHRpZiAoIXJlZ2lzdGVyZWRJbk1vZHVsZUxvYWRlcikge1xuXHRcdHZhciBPbGRDb29raWVzID0gd2luZG93LkNvb2tpZXM7XG5cdFx0dmFyIGFwaSA9IHdpbmRvdy5Db29raWVzID0gZmFjdG9yeSgpO1xuXHRcdGFwaS5ub0NvbmZsaWN0ID0gZnVuY3Rpb24gKCkge1xuXHRcdFx0d2luZG93LkNvb2tpZXMgPSBPbGRDb29raWVzO1xuXHRcdFx0cmV0dXJuIGFwaTtcblx0XHR9O1xuXHR9XG59KGZ1bmN0aW9uICgpIHtcblx0ZnVuY3Rpb24gZXh0ZW5kICgpIHtcblx0XHR2YXIgaSA9IDA7XG5cdFx0dmFyIHJlc3VsdCA9IHt9O1xuXHRcdGZvciAoOyBpIDwgYXJndW1lbnRzLmxlbmd0aDsgaSsrKSB7XG5cdFx0XHR2YXIgYXR0cmlidXRlcyA9IGFyZ3VtZW50c1sgaSBdO1xuXHRcdFx0Zm9yICh2YXIga2V5IGluIGF0dHJpYnV0ZXMpIHtcblx0XHRcdFx0cmVzdWx0W2tleV0gPSBhdHRyaWJ1dGVzW2tleV07XG5cdFx0XHR9XG5cdFx0fVxuXHRcdHJldHVybiByZXN1bHQ7XG5cdH1cblxuXHRmdW5jdGlvbiBpbml0IChjb252ZXJ0ZXIpIHtcblx0XHRmdW5jdGlvbiBhcGkgKGtleSwgdmFsdWUsIGF0dHJpYnV0ZXMpIHtcblx0XHRcdHZhciByZXN1bHQ7XG5cdFx0XHRpZiAodHlwZW9mIGRvY3VtZW50ID09PSAndW5kZWZpbmVkJykge1xuXHRcdFx0XHRyZXR1cm47XG5cdFx0XHR9XG5cblx0XHRcdC8vIFdyaXRlXG5cblx0XHRcdGlmIChhcmd1bWVudHMubGVuZ3RoID4gMSkge1xuXHRcdFx0XHRhdHRyaWJ1dGVzID0gZXh0ZW5kKHtcblx0XHRcdFx0XHRwYXRoOiAnLydcblx0XHRcdFx0fSwgYXBpLmRlZmF1bHRzLCBhdHRyaWJ1dGVzKTtcblxuXHRcdFx0XHRpZiAodHlwZW9mIGF0dHJpYnV0ZXMuZXhwaXJlcyA9PT0gJ251bWJlcicpIHtcblx0XHRcdFx0XHR2YXIgZXhwaXJlcyA9IG5ldyBEYXRlKCk7XG5cdFx0XHRcdFx0ZXhwaXJlcy5zZXRNaWxsaXNlY29uZHMoZXhwaXJlcy5nZXRNaWxsaXNlY29uZHMoKSArIGF0dHJpYnV0ZXMuZXhwaXJlcyAqIDg2NGUrNSk7XG5cdFx0XHRcdFx0YXR0cmlidXRlcy5leHBpcmVzID0gZXhwaXJlcztcblx0XHRcdFx0fVxuXG5cdFx0XHRcdHRyeSB7XG5cdFx0XHRcdFx0cmVzdWx0ID0gSlNPTi5zdHJpbmdpZnkodmFsdWUpO1xuXHRcdFx0XHRcdGlmICgvXltcXHtcXFtdLy50ZXN0KHJlc3VsdCkpIHtcblx0XHRcdFx0XHRcdHZhbHVlID0gcmVzdWx0O1xuXHRcdFx0XHRcdH1cblx0XHRcdFx0fSBjYXRjaCAoZSkge31cblxuXHRcdFx0XHRpZiAoIWNvbnZlcnRlci53cml0ZSkge1xuXHRcdFx0XHRcdHZhbHVlID0gZW5jb2RlVVJJQ29tcG9uZW50KFN0cmluZyh2YWx1ZSkpXG5cdFx0XHRcdFx0XHQucmVwbGFjZSgvJSgyM3wyNHwyNnwyQnwzQXwzQ3wzRXwzRHwyRnwzRnw0MHw1Qnw1RHw1RXw2MHw3Qnw3RHw3QykvZywgZGVjb2RlVVJJQ29tcG9uZW50KTtcblx0XHRcdFx0fSBlbHNlIHtcblx0XHRcdFx0XHR2YWx1ZSA9IGNvbnZlcnRlci53cml0ZSh2YWx1ZSwga2V5KTtcblx0XHRcdFx0fVxuXG5cdFx0XHRcdGtleSA9IGVuY29kZVVSSUNvbXBvbmVudChTdHJpbmcoa2V5KSk7XG5cdFx0XHRcdGtleSA9IGtleS5yZXBsYWNlKC8lKDIzfDI0fDI2fDJCfDVFfDYwfDdDKS9nLCBkZWNvZGVVUklDb21wb25lbnQpO1xuXHRcdFx0XHRrZXkgPSBrZXkucmVwbGFjZSgvW1xcKFxcKV0vZywgZXNjYXBlKTtcblxuXHRcdFx0XHRyZXR1cm4gKGRvY3VtZW50LmNvb2tpZSA9IFtcblx0XHRcdFx0XHRrZXksICc9JywgdmFsdWUsXG5cdFx0XHRcdFx0YXR0cmlidXRlcy5leHBpcmVzID8gJzsgZXhwaXJlcz0nICsgYXR0cmlidXRlcy5leHBpcmVzLnRvVVRDU3RyaW5nKCkgOiAnJywgLy8gdXNlIGV4cGlyZXMgYXR0cmlidXRlLCBtYXgtYWdlIGlzIG5vdCBzdXBwb3J0ZWQgYnkgSUVcblx0XHRcdFx0XHRhdHRyaWJ1dGVzLnBhdGggPyAnOyBwYXRoPScgKyBhdHRyaWJ1dGVzLnBhdGggOiAnJyxcblx0XHRcdFx0XHRhdHRyaWJ1dGVzLmRvbWFpbiA/ICc7IGRvbWFpbj0nICsgYXR0cmlidXRlcy5kb21haW4gOiAnJyxcblx0XHRcdFx0XHRhdHRyaWJ1dGVzLnNlY3VyZSA/ICc7IHNlY3VyZScgOiAnJ1xuXHRcdFx0XHRdLmpvaW4oJycpKTtcblx0XHRcdH1cblxuXHRcdFx0Ly8gUmVhZFxuXG5cdFx0XHRpZiAoIWtleSkge1xuXHRcdFx0XHRyZXN1bHQgPSB7fTtcblx0XHRcdH1cblxuXHRcdFx0Ly8gVG8gcHJldmVudCB0aGUgZm9yIGxvb3AgaW4gdGhlIGZpcnN0IHBsYWNlIGFzc2lnbiBhbiBlbXB0eSBhcnJheVxuXHRcdFx0Ly8gaW4gY2FzZSB0aGVyZSBhcmUgbm8gY29va2llcyBhdCBhbGwuIEFsc28gcHJldmVudHMgb2RkIHJlc3VsdCB3aGVuXG5cdFx0XHQvLyBjYWxsaW5nIFwiZ2V0KClcIlxuXHRcdFx0dmFyIGNvb2tpZXMgPSBkb2N1bWVudC5jb29raWUgPyBkb2N1bWVudC5jb29raWUuc3BsaXQoJzsgJykgOiBbXTtcblx0XHRcdHZhciByZGVjb2RlID0gLyglWzAtOUEtWl17Mn0pKy9nO1xuXHRcdFx0dmFyIGkgPSAwO1xuXG5cdFx0XHRmb3IgKDsgaSA8IGNvb2tpZXMubGVuZ3RoOyBpKyspIHtcblx0XHRcdFx0dmFyIHBhcnRzID0gY29va2llc1tpXS5zcGxpdCgnPScpO1xuXHRcdFx0XHR2YXIgY29va2llID0gcGFydHMuc2xpY2UoMSkuam9pbignPScpO1xuXG5cdFx0XHRcdGlmIChjb29raWUuY2hhckF0KDApID09PSAnXCInKSB7XG5cdFx0XHRcdFx0Y29va2llID0gY29va2llLnNsaWNlKDEsIC0xKTtcblx0XHRcdFx0fVxuXG5cdFx0XHRcdHRyeSB7XG5cdFx0XHRcdFx0dmFyIG5hbWUgPSBwYXJ0c1swXS5yZXBsYWNlKHJkZWNvZGUsIGRlY29kZVVSSUNvbXBvbmVudCk7XG5cdFx0XHRcdFx0Y29va2llID0gY29udmVydGVyLnJlYWQgP1xuXHRcdFx0XHRcdFx0Y29udmVydGVyLnJlYWQoY29va2llLCBuYW1lKSA6IGNvbnZlcnRlcihjb29raWUsIG5hbWUpIHx8XG5cdFx0XHRcdFx0XHRjb29raWUucmVwbGFjZShyZGVjb2RlLCBkZWNvZGVVUklDb21wb25lbnQpO1xuXG5cdFx0XHRcdFx0aWYgKHRoaXMuanNvbikge1xuXHRcdFx0XHRcdFx0dHJ5IHtcblx0XHRcdFx0XHRcdFx0Y29va2llID0gSlNPTi5wYXJzZShjb29raWUpO1xuXHRcdFx0XHRcdFx0fSBjYXRjaCAoZSkge31cblx0XHRcdFx0XHR9XG5cblx0XHRcdFx0XHRpZiAoa2V5ID09PSBuYW1lKSB7XG5cdFx0XHRcdFx0XHRyZXN1bHQgPSBjb29raWU7XG5cdFx0XHRcdFx0XHRicmVhaztcblx0XHRcdFx0XHR9XG5cblx0XHRcdFx0XHRpZiAoIWtleSkge1xuXHRcdFx0XHRcdFx0cmVzdWx0W25hbWVdID0gY29va2llO1xuXHRcdFx0XHRcdH1cblx0XHRcdFx0fSBjYXRjaCAoZSkge31cblx0XHRcdH1cblxuXHRcdFx0cmV0dXJuIHJlc3VsdDtcblx0XHR9XG5cblx0XHRhcGkuc2V0ID0gYXBpO1xuXHRcdGFwaS5nZXQgPSBmdW5jdGlvbiAoa2V5KSB7XG5cdFx0XHRyZXR1cm4gYXBpLmNhbGwoYXBpLCBrZXkpO1xuXHRcdH07XG5cdFx0YXBpLmdldEpTT04gPSBmdW5jdGlvbiAoKSB7XG5cdFx0XHRyZXR1cm4gYXBpLmFwcGx5KHtcblx0XHRcdFx0anNvbjogdHJ1ZVxuXHRcdFx0fSwgW10uc2xpY2UuY2FsbChhcmd1bWVudHMpKTtcblx0XHR9O1xuXHRcdGFwaS5kZWZhdWx0cyA9IHt9O1xuXG5cdFx0YXBpLnJlbW92ZSA9IGZ1bmN0aW9uIChrZXksIGF0dHJpYnV0ZXMpIHtcblx0XHRcdGFwaShrZXksICcnLCBleHRlbmQoYXR0cmlidXRlcywge1xuXHRcdFx0XHRleHBpcmVzOiAtMVxuXHRcdFx0fSkpO1xuXHRcdH07XG5cblx0XHRhcGkud2l0aENvbnZlcnRlciA9IGluaXQ7XG5cblx0XHRyZXR1cm4gYXBpO1xuXHR9XG5cblx0cmV0dXJuIGluaXQoZnVuY3Rpb24gKCkge30pO1xufSkpO1xuXG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gLi9+L2pzLWNvb2tpZS9zcmMvanMuY29va2llLmpzXG4vLyBtb2R1bGUgaWQgPSA0XG4vLyBtb2R1bGUgY2h1bmtzID0gMCJdLCJzb3VyY2VSb290IjoiIn0=");
 
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
 
-	eval("'use strict';Object.defineProperty(exports, \"__esModule\", { value: true });exports.isCookieEnabled = exports.isBrowser = exports.parse = exports.log = undefined;var _typeof = typeof Symbol === \"function\" && typeof Symbol.iterator === \"symbol\" ? function (obj) {return typeof obj;} : function (obj) {return obj && typeof Symbol === \"function\" && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj;};var _config = __webpack_require__(6);\n\n\n\n\n\n\nvar log = exports.log = function log(text) {var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';var debug = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;\n  if (!debug) {\n    return;\n  }\n\n  var success = 'padding: 2px; background: #219621; color: #ffffff';\n  var warning = 'padding: 2px; background: #f1e05a; color: #333333';\n  var error = 'padding: 2px; background: #b9090b; color: #ffffff';\n  var types = { error: error, success: success, warning: warning };\n\n  console.log('%c [Storage Helper] ' + text + ' ', types[type]);\n};\n\n\n\n\n\n\nvar parse = exports.parse = function parse(data) {\n  try {\n    return JSON.parse(data);\n  } catch (e) {\n    log('Oops! Some problems parsing this ' + (typeof data === 'undefined' ? 'undefined' : _typeof(data)) + '.', 'error', _config.debug);\n  }\n\n  return null;\n};\n\n\n\n\n\nvar isBrowser = exports.isBrowser = typeof window !== 'undefined';\n\n\n\n\n\n\n\n\nvar isCookieEnabled = exports.isCookieEnabled = isBrowser && navigator && navigator.cookieEnabled;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvdXRpbHMuanM/MmZmOCJdLCJuYW1lcyI6WyJsb2ciLCJ0ZXh0IiwidHlwZSIsImRlYnVnIiwic3VjY2VzcyIsIndhcm5pbmciLCJlcnJvciIsInR5cGVzIiwiY29uc29sZSIsInBhcnNlIiwiZGF0YSIsIkpTT04iLCJlIiwiaXNCcm93c2VyIiwid2luZG93IiwiaXNDb29raWVFbmFibGVkIiwibmF2aWdhdG9yIiwiY29va2llRW5hYmxlZCJdLCJtYXBwaW5ncyI6IjBhQUFBOzs7Ozs7O0FBT08sSUFBTUEsb0JBQU0sU0FBTkEsR0FBTSxDQUFDQyxJQUFELEVBQTJDLEtBQXBDQyxJQUFvQyx1RUFBN0IsU0FBNkIsS0FBbEJDLEtBQWtCLHVFQUFWLEtBQVU7QUFDNUQsTUFBSSxDQUFDQSxLQUFMLEVBQVk7QUFDVjtBQUNEOztBQUVELE1BQU1DLFVBQVUsbURBQWhCO0FBQ0EsTUFBTUMsVUFBVSxtREFBaEI7QUFDQSxNQUFNQyxRQUFRLG1EQUFkO0FBQ0EsTUFBTUMsUUFBUSxFQUFFRCxZQUFGLEVBQVNGLGdCQUFULEVBQWtCQyxnQkFBbEIsRUFBZDs7QUFFQUcsVUFBUVIsR0FBUiwwQkFBbUNDLElBQW5DLFFBQTRDTSxNQUFNTCxJQUFOLENBQTVDO0FBQ0QsQ0FYTTs7Ozs7OztBQWtCQSxJQUFNTyx3QkFBUSxTQUFSQSxLQUFRLENBQUNDLElBQUQsRUFBVTtBQUM3QixNQUFJO0FBQ0YsV0FBT0MsS0FBS0YsS0FBTCxDQUFXQyxJQUFYLENBQVA7QUFDRCxHQUZELENBRUUsT0FBT0UsQ0FBUCxFQUFVO0FBQ1ZaLHNEQUErQ1UsSUFBL0MseUNBQStDQSxJQUEvQyxVQUF3RCxPQUF4RDtBQUNEOztBQUVELFNBQU8sSUFBUDtBQUNELENBUk07Ozs7OztBQWNBLElBQU1HLGdDQUFZLE9BQU9DLE1BQVAsS0FBa0IsV0FBcEM7Ozs7Ozs7OztBQVNBLElBQU1DLDRDQUFrQkYsYUFBYUcsU0FBYixJQUEwQkEsVUFBVUMsYUFBNUQiLCJmaWxlIjoiNS5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGRlYnVnIH0gZnJvbSAnLi9jb25maWcnXG5cbi8qKlxuICogTG9nZ2VyIGZvciBkaWZmZXJlbnQgdHlwZSBvZiBtZXNzYWdlcy5cbiAqIEBwYXJhbSAge1N0cmluZ30gdGV4dFxuICogQHBhcmFtICB7U3RyaW5nfSBbdHlwZT0nc3VjY2VzcyddXG4gKi9cbmV4cG9ydCBjb25zdCBsb2cgPSAodGV4dCwgdHlwZSA9ICdzdWNjZXNzJywgZGVidWcgPSBmYWxzZSkgPT4ge1xuICBpZiAoIWRlYnVnKSB7XG4gICAgcmV0dXJuXG4gIH1cblxuICBjb25zdCBzdWNjZXNzID0gJ3BhZGRpbmc6IDJweDsgYmFja2dyb3VuZDogIzIxOTYyMTsgY29sb3I6ICNmZmZmZmYnXG4gIGNvbnN0IHdhcm5pbmcgPSAncGFkZGluZzogMnB4OyBiYWNrZ3JvdW5kOiAjZjFlMDVhOyBjb2xvcjogIzMzMzMzMydcbiAgY29uc3QgZXJyb3IgPSAncGFkZGluZzogMnB4OyBiYWNrZ3JvdW5kOiAjYjkwOTBiOyBjb2xvcjogI2ZmZmZmZidcbiAgY29uc3QgdHlwZXMgPSB7IGVycm9yLCBzdWNjZXNzLCB3YXJuaW5nIH1cblxuICBjb25zb2xlLmxvZyhgJWMgW1N0b3JhZ2UgSGVscGVyXSAke3RleHR9IGAsIHR5cGVzW3R5cGVdKVxufVxuXG4vKipcbiAqIEpTT04gcGFyc2Ugd2l0aCBlcnJvclxuICogQHBhcmFtICB7U3RyaW5nfSBkYXRhXG4gKiBAcmV0dXJuIHtTdHJpbmd8bnVsbH1cbiAqL1xuZXhwb3J0IGNvbnN0IHBhcnNlID0gKGRhdGEpID0+IHtcbiAgdHJ5IHtcbiAgICByZXR1cm4gSlNPTi5wYXJzZShkYXRhKVxuICB9IGNhdGNoIChlKSB7XG4gICAgbG9nKGBPb3BzISBTb21lIHByb2JsZW1zIHBhcnNpbmcgdGhpcyAke3R5cGVvZiBkYXRhfS5gLCAnZXJyb3InLCBkZWJ1ZylcbiAgfVxuXG4gIHJldHVybiBudWxsXG59XG5cbi8qKlxuICogQ2hlY2tzIGlmIHJ1bm5pbmcgYSBicm93c2VyIGVudmlyb25tZW50XG4gKiBAdHlwZSB7Qm9vbGVhbn1cbiAqL1xuZXhwb3J0IGNvbnN0IGlzQnJvd3NlciA9IHR5cGVvZiB3aW5kb3cgIT09ICd1bmRlZmluZWQnXG5cbi8qKlxuICogQ2hlY2tzIGlmIGNvb2tpZXMgYXJlIGJsb2NrZWQuXG4gKiBXaXRoIGNvb2tpZXMgYXJlIGludGVuZGVkIGFsbCB0eXBlcyBvZiBicm93c2VyIHN0b3JhZ2U6XG4gKiBsb2NhbFN0b3JhZ2UsIHNlc3Npb25TdG9yYWdlIGFuZCBjb29raWVzXG4gKiBJbiBjYXNlIG9mIGEgZmFsc2UgdGhlIHBsYWluIG9iamVjdCBzdG9yaW5nIHdpbGwga2ljayBpbi5cbiAqIEB0eXBlIHtCb29sZWFufVxuICovXG5leHBvcnQgY29uc3QgaXNDb29raWVFbmFibGVkID0gaXNCcm93c2VyICYmIG5hdmlnYXRvciAmJiBuYXZpZ2F0b3IuY29va2llRW5hYmxlZFxuXG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIC4vc3JjL3V0aWxzLmpzIl0sInNvdXJjZVJvb3QiOiIifQ==");
 
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
 
-	eval("\"use strict\";Object.defineProperty(exports, \"__esModule\", { value: true });var debug = exports.debug = false;\n\nvar setDebug = exports.setDebug = function setDebug(value) {\n  exports.debug = debug = value;\n};//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvY29uZmlnLmpzPzQyNjQiXSwibmFtZXMiOlsiZGVidWciLCJzZXREZWJ1ZyIsInZhbHVlIl0sIm1hcHBpbmdzIjoiMkVBQU8sSUFBSUEsd0JBQVEsS0FBWjs7QUFFQSxJQUFNQyw4QkFBVyxTQUFYQSxRQUFXLENBQUNDLEtBQUQsRUFBVztBQUNqQyxVQUhTRixLQUdULFdBQVFFLEtBQVI7QUFDRCxDQUZNIiwiZmlsZSI6IjYuanMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgbGV0IGRlYnVnID0gZmFsc2VcblxuZXhwb3J0IGNvbnN0IHNldERlYnVnID0gKHZhbHVlKSA9PiB7XG4gIGRlYnVnID0gdmFsdWVcbn1cblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyAuL3NyYy9jb25maWcuanMiXSwic291cmNlUm9vdCI6IiJ9");
 
-/***/ }
-/******/ ])
-});
-;
+
+
+
+
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
+
+/**
+ * Logger for different type of messages.
+ * @param  {String} text
+ * @param  {String} [type='success']
+ */
+var log = function log(text) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'success';
+  var debug$$1 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+  if (!debug$$1) {
+    return;
+  }
+
+  var success = 'padding: 2px; background: #219621; color: #ffffff';
+  var warning = 'padding: 2px; background: #f1e05a; color: #333333';
+  var error = 'padding: 2px; background: #b9090b; color: #ffffff';
+  var types = { error: error, success: success, warning: warning };
+
+  console.log('%c [Storage Helper] ' + text + ' ', types[type]);
+};
+
+/**
+ * JSON parse with error
+ * @param  {String} data
+ * @return {String|null}
+ */
+var parse = function parse(data) {
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    log('Oops! Some problems parsing this ' + (typeof data === 'undefined' ? 'undefined' : _typeof(data)) + '.', 'error', debug);
+  }
+
+  return null;
+};
+
+/**
+ * Checks if running a browser environment
+ * @type {Boolean}
+ */
+var isBrowser = typeof window !== 'undefined';
+
+/**
+ * Checks if cookies are blocked.
+ * With cookies are intended all types of browser storage:
+ * localStorage, sessionStorage and cookies
+ * In case of a false the plain object storing will kick in.
+ * @type {Boolean}
+ */
+var isCookieEnabled = isBrowser && navigator && navigator.cookieEnabled;
+
+/**
+ * Set the item in the cookies if possible, otherwise is going to store it
+ * inside a plain object
+ * @param {String} key
+ * @param {String} value
+ * @param {Number} [expires=1]
+ */
+var setItem$2 = function setItem$2(key, value) {
+  var expires = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
+  if (!isCookieEnabled) {
+    session.setItem(key, value);
+    log('I\'ve saved "' + key + '" in a plain object :)', 'warning', debug);
+    return;
+  }
+
+  cookie.set(key, value, { expires: expires });
+  log('I\'ve saved "' + key + '" in a cookie :)', 'warning', debug);
+};
+
+/**
+ * Get value from a cookie
+ * @param  {String} key
+ * @return {String}
+ */
+var getItem$2 = function getItem$2(key) {
+  return cookie.get(key);
+};
+
+/**
+ * Remove cookie
+ * @param  {String} key [description]
+ */
+var removeItem$2 = function removeItem$2(key) {
+  cookie.remove(key);
+};
+
+/**
+ * Remove all cookies
+ */
+var clear$2 = function clear$2() {
+  var cookies = isBrowser && document.cookie.split(';');
+
+  if (!cookies.length) {
+    return;
+  }
+
+  for (var i = 0, l = cookies.length; i < l; i++) {
+    var item = cookies[i];
+    var key = item.split('=')[0];
+
+    cookie.remove(key);
+  }
+};
+
+var cookie$1 = { setItem: setItem$2, getItem: getItem$2, removeItem: removeItem$2, clear: clear$2 };
+
+/**
+ * Reference to the localStorage object
+ * Apparently Safari doesn't want to even try to check if the localStorage
+ * exists, so we're not gonna touch it if cookies are blocked in first place.
+ * @type {LocalStorage}
+ */
+var localstorage = isCookieEnabled ? window.localStorage : undefined;
+
+/**
+ * To avoid the try/catch to be called multiple times, the value
+ * of the check is gonna be stored here.
+ * @type {Boolean}
+ */
+var checker = void 0;
+
+/**
+ * LocalStorage check
+ * @return {Boolean}
+ */
+var hasLocalStorage = function hasLocalStorage() {
+  if (!localstorage) {
+    checker = false;
+  }
+
+  if (typeof checker !== 'undefined') {
+    return checker;
+  }
+
+  try {
+    localstorage.setItem('0', '');
+    localstorage.removeItem('0');
+    checker = true;
+  } catch (e) {
+    checker = false;
+  }
+
+  return checker;
+};
+
+/**
+ * Set the item.
+ * Here data will be saved in the LocalStorage if it doesn't exist, otherwise we'll
+ * try cookies and if we're not in a lucky day, data will be stored in a plain object.
+ *
+ * An extra check is done here for the QuotaExceededError.
+ * I'll try to save data and just silently warning it
+ * in the console, so also real-time error tracking tools won't stress too much.
+ * @param {String}  key
+ * @param {String}  value
+ * @param {Boolean} [persistency=true]
+ */
+var setItem = function setItem(key, value) {
+  var persistency = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+  if (!persistency) {
+    session.setItem(key, value);
+    return;
+  }
+
+  if (!hasLocalStorage()) {
+    cookie$1.setItem(key, value);
+    return;
+  }
+
+  try {
+    localstorage.setItem(key, value);
+  } catch (e) {
+    var code = e.code;
+
+
+    if (code === 22 || code === 1014) {
+      log('Quota exceeded for "' + key + '"!', 'error', debug);
+
+      // Let's try with cookies then!
+      cookie$1.setItem(key, value);
+    }
+  }
+};
+
+/**
+ * Get the item
+ * Here the object is taken from the localStorage if it was available,
+ * or from the object if wasn't possible or if simple wasn't saved permanently
+ * @param  {String}  key
+ * @param  {Boolean} [parsed=false]
+ * @return {any}
+ */
+var getItem = function getItem(key) {
+  var parsed = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+  var result = void 0;
+
+  var cookieItem = cookie$1.getItem(key);
+  var sessionItem = session.getItem(key);
+
+  if (!hasLocalStorage()) {
+    result = cookieItem || sessionItem;
+  } else {
+    result = localstorage.getItem(key) || cookieItem || sessionItem;
+  }
+
+  return parsed ? parse(result) : result;
+};
+
+/**
+ * Clear all storage
+ */
+var clear = function clear() {
+  cookie$1.clear();
+  session.clear();
+
+  if (!hasLocalStorage()) {
+    return;
+  }
+
+  localstorage.clear();
+};
+
+/**
+ * Remove a single item from the storage
+ * @param  {String}  key
+ */
+var removeItem = function removeItem(key) {
+  cookie$1.removeItem(key);
+  session.removeItem(key);
+
+  if (!hasLocalStorage()) {
+    return;
+  }
+
+  localstorage.removeItem(key);
+};
+
+var showStorageLogger = function showStorageLogger(value) {
+  setDebug(!!value);
+};
+
+/**
+ * Exports all features, so will be possible to use it as an object as well
+ */
+var index = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };
+
+exports.setItem = setItem;
+exports.getItem = getItem;
+exports.clear = clear;
+exports.removeItem = removeItem;
+exports.showStorageLogger = showStorageLogger;
+exports['default'] = index;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
