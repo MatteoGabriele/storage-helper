@@ -7,7 +7,7 @@ import { debug, setDebug } from './config'
  * Checks if running a browser environment
  * @type {Boolean}
  */
-const isBrowser = typeof window !== undefined
+const isBrowser = typeof window !== 'undefined'
 
 /**
  * Checks if cookies are blocked.
@@ -16,7 +16,7 @@ const isBrowser = typeof window !== undefined
  * In case of a false the plain object storing will kick in.
  * @type {Boolean}
  */
-const isCookieEnabled = navigator && navigator.cookieEnabled && isBrowser
+const isCookieEnabled = isBrowser && navigator && navigator.cookieEnabled
 
 /**
  * Reference to the localStorage object

@@ -7,7 +7,7 @@ import { debug } from './config'
  * Checks if running in a browser environment
  * @type {Boolean}
  */
-const isBrowser = typeof window !== undefined
+const isBrowser = typeof window !== 'undefined'
 
 /**
  * Set the item in the cookies if possible, otherwise is going to store it
