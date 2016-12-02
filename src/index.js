@@ -1,22 +1,7 @@
 import session from './session'
 import cookie from './cookie'
-import { log } from './utils'
+import { log, isCookieEnabled, parse } from './utils'
 import { debug, setDebug } from './config'
-
-/**
- * Checks if running a browser environment
- * @type {Boolean}
- */
-const isBrowser = typeof window !== 'undefined'
-
-/**
- * Checks if cookies are blocked.
- * With cookies are intended all types of browser storage:
- * localStorage, sessionStorage and cookies
- * In case of a false the plain object storing will kick in.
- * @type {Boolean}
- */
-const isCookieEnabled = isBrowser && navigator && navigator.cookieEnabled
 
 /**
  * Reference to the localStorage object
@@ -70,12 +55,12 @@ const hasLocalStorage = () => {
  * @param {Boolean} [persistency=true]
  */
 export const setItem = (key, value, persistency = true) => {
-  if (!hasLocalStorage() || !persistency) {
-    if (!persistency) {
-      session.setItem(key, value)
-      return
-    }
+  if (!persistency) {
+    session.setItem(key, value)
+    return
+  }
 
+  if (!hasLocalStorage()) {
     cookie.setItem(key, value)
     return
   }
@@ -103,10 +88,10 @@ export const setItem = (key, value, persistency = true) => {
  * @return {any}
  */
 export const getItem = (key, parsed = false) => {
+  let result
+
   const cookieItem = cookie.getItem(key)
   const sessionItem = session.getItem(key)
-
-  let result
 
   if (!hasLocalStorage()) {
     result = cookieItem || sessionItem
@@ -114,17 +99,7 @@ export const getItem = (key, parsed = false) => {
     result = localstorage.getItem(key) || cookieItem || sessionItem
   }
 
-  try {
-    return parsed ? JSON.parse(result) : result
-  } catch (e) {
-    if (parsed) {
-      log(`Oops! Some problems parsing this ${typeof result}.`, 'error', debug)
-    } else {
-      log(e, 'error', debug)
-    }
-  }
-
-  return null
+  return parsed ? parse(result) : result
 }
 
 /**

@@ -1,13 +1,7 @@
 import session from './session'
 import cookie from 'js-cookie'
-import { log } from './utils'
+import { log, isCookieEnabled, isBrowser } from './utils'
 import { debug } from './config'
-
-/**
- * Checks if running in a browser environment
- * @type {Boolean}
- */
-const isBrowser = typeof window !== 'undefined'
 
 /**
  * Set the item in the cookies if possible, otherwise is going to store it
@@ -17,7 +11,7 @@ const isBrowser = typeof window !== 'undefined'
  * @param {Number} [expires=1]
  */
 const setItem = (key, value, expires = 1) => {
-  if (isBrowser && window.navigator && !window.navigator.cookieEnabled) {
+  if (!isCookieEnabled) {
     session.setItem(key, value)
     log(`I've saved "${key}" in a plain object :)`, 'warning', debug)
     return
@@ -48,7 +42,7 @@ const removeItem = (key) => {
  * Remove all cookies
  */
 const clear = () => {
-  const cookies = document.cookie.split(';')
+  const cookies = isBrowser && document.cookie.split(';')
 
   if (!cookies.length) {
     return

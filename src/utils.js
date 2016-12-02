@@ -1,3 +1,5 @@
+import { debug } from './config'
+
 /**
  * Logger for different type of messages.
  * @param  {String} text
@@ -15,3 +17,33 @@ export const log = (text, type = 'success', debug = false) => {
 
   console.log(`%c [Storage Helper] ${text} `, types[type])
 }
+
+/**
+ * JSON parse with error
+ * @param  {String} data
+ * @return {String|null}
+ */
+export const parse = (data) => {
+  try {
+    return JSON.parse(data)
+  } catch (e) {
+    log(`Oops! Some problems parsing this ${typeof data}.`, 'error', debug)
+  }
+
+  return null
+}
+
+/**
+ * Checks if running a browser environment
+ * @type {Boolean}
+ */
+export const isBrowser = typeof window !== 'undefined'
+
+/**
+ * Checks if cookies are blocked.
+ * With cookies are intended all types of browser storage:
+ * localStorage, sessionStorage and cookies
+ * In case of a false the plain object storing will kick in.
+ * @type {Boolean}
+ */
+export const isCookieEnabled = isBrowser && navigator && navigator.cookieEnabled
