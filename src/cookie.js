@@ -4,6 +4,12 @@ import { log } from './utils'
 import { debug } from './config'
 
 /**
+ * Checks if running in a browser environment
+ * @type {Boolean}
+ */
+const isBrowser = typeof window !== undefined
+
+/**
  * Set the item in the cookies if possible, otherwise is going to store it
  * inside a plain object
  * @param {String} key
@@ -11,7 +17,7 @@ import { debug } from './config'
  * @param {Number} [expires=1]
  */
 const setItem = (key, value, expires = 1) => {
-  if (window.navigator && !window.navigator.cookieEnabled) {
+  if (isBrowser && window.navigator && !window.navigator.cookieEnabled) {
     session.setItem(key, value)
     log(`I've saved "${key}" in a plain object :)`, 'warning', debug)
     return

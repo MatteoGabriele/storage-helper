@@ -4,13 +4,19 @@ import { log } from './utils'
 import { debug, setDebug } from './config'
 
 /**
+ * Checks if running a browser environment
+ * @type {Boolean}
+ */
+const isBrowser = typeof window !== undefined
+
+/**
  * Checks if cookies are blocked.
  * With cookies are intended all types of browser storage:
  * localStorage, sessionStorage and cookies
  * In case of a false the plain object storing will kick in.
  * @type {Boolean}
  */
-const isCookieEnabled = navigator && navigator.cookieEnabled
+const isCookieEnabled = navigator && navigator.cookieEnabled && isBrowser
 
 /**
  * Reference to the localStorage object
