@@ -1,5 +1,5 @@
 /*!
- * storage-helper v1.3.5
+ * storage-helper v1.3.6
  * (c) 2016 Matteo Gabriele
  * Released under the ISC License.
  */
