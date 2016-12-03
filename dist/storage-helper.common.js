@@ -3,13 +3,13 @@
  * (c) 2016 Matteo Gabriele
  * Released under the ISC License.
  */
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('js-cookie')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'js-cookie'], factory) :
-  (factory((global.StorageHelper = global.StorageHelper || {}),global.cookie));
-}(this, (function (exports,cookie) { 'use strict';
+'use strict';
 
-cookie = 'default' in cookie ? cookie['default'] : cookie;
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var cookie = _interopDefault(require('js-cookie'));
 
 /**
  * This will be our session storage in case of everything fails!
@@ -408,7 +408,3 @@ exports.clear = clear;
 exports.removeItem = removeItem;
 exports.showStorageLogger = showStorageLogger;
 exports['default'] = index;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));

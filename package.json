@@ -2,17 +2,27 @@
   "name": "storage-helper",
   "version": "1.3.5",
   "description": "A very simple way to manage browser storage",
-  "main": "dist/storage-helper.js",
+  "author": {
+    "name": "Matteo Gabriele",
+    "email": "m.gabriele.dev@gmail.com"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MatteoGabriele/storage-helper.git"
   },
   "scripts": {
     "dev": "webpack --config config/dev.js -w",
-    "build": "rollup --config config/build.js",
+    "build": "node config/build.js",
     "test": "karma start ./test/karma.config.js --singleRun",
     "test:watch": "karma start ./test/karma.config.js"
   },
+  "main": "dist/storage-helper.common.js",
+  "files": [
+    "dist/storage-helper.js",
+    "dist/storage-helper.min.js",
+    "dist/storage-helper.common.js",
+    "src"
+  ],
   "keywords": [
     "localStorage",
     "local",
@@ -21,7 +31,6 @@
     "cookie",
     "cookies"
   ],
-  "author": "Matteo Gabriele <m.gabriele.dev@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MatteoGabriele/storage-helper/issues"
@@ -59,7 +68,8 @@
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-uglify": "^1.0.1",
     "webpack": "^1.13.2",
-    "webpack-merge": "^0.17.0"
+    "webpack-merge": "^0.17.0",
+    "zlib": "^1.0.5"
   },
   "dependencies": {
     "js-cookie": "^2.1.3"
