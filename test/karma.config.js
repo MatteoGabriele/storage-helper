@@ -1,4 +1,4 @@
-var webpackConfig = require('../config/webpack.base.config');
+var webpackConfig = require('../config/dev');
 var isTravis = !!process.env.TRAVIS
 
 delete webpackConfig.entry
