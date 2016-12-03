@@ -8,8 +8,8 @@
     "url": "git+https://github.com/MatteoGabriele/storage-helper.git"
   },
   "scripts": {
-    "dev": "webpack --config webpack/dev/webpack.config.js -w",
-    "build": "rollup --config",
+    "dev": "webpack --config config/dev/webpack.config.js -w",
+    "build": "rollup --config config/rollup.config.js",
     "test": "karma start ./test/karma.config.js --singleRun",
     "test:watch": "karma start ./test/karma.config.js"
   },

@@ -1,4 +1,4 @@
-var webpackConfig = require('../webpack/webpack.base.config');
+var webpackConfig = require('../config/webpack.base.config');
 var isTravis = !!process.env.TRAVIS
 
 delete webpackConfig.entry
@@ -35,7 +35,11 @@ module.exports = function (config) {
         loaders: [
           {
             test: /\.js$/,
-            loader: 'babel',
+            loader: 'babel-loader',
+            query: {
+              retainLines: true,
+              presets: ['es2015']
+            },
             exclude: /node_modules/
           }
         ]

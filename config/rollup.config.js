@@ -1,7 +1,7 @@
 import babel from 'rollup-plugin-babel'
 import uglify from 'rollup-plugin-uglify'
 
-let pkg = require('./package.json')
+let pkg = require('../package.json')
 let external = Object.keys(pkg.dependencies)
 
 export default {
@@ -11,5 +11,11 @@ export default {
   moduleName: 'storageHelper',
   dest: pkg['main'],
   external: external,
-  plugins: [ babel(), uglify() ]
+  plugins: [
+    babel({
+      babelrc: false,
+      presets: ['es2015-rollup']
+    }),
+    uglify()
+  ]
 }
