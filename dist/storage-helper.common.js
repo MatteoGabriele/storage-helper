@@ -1,6 +1,6 @@
 /*!
  * storage-helper v1.3.6
- * (c) 2016 Matteo Gabriele
+ * (c) 2017 Matteo Gabriele
  * Released under the ISC License.
  */
 'use strict';
@@ -189,7 +189,7 @@ var parse = function parse(data) {
 };
 
 /**
- * Checks if running a browser environment
+ * Checks if we are in a browser
  * @type {Boolean}
  */
 var isBrowser = typeof window !== 'undefined';
@@ -277,6 +277,7 @@ var checker = void 0;
 
 /**
  * LocalStorage check
+ * The check on the localStorage is done only one time
  * @return {Boolean}
  */
 var hasLocalStorage = function hasLocalStorage() {
@@ -301,8 +302,10 @@ var hasLocalStorage = function hasLocalStorage() {
 
 /**
  * Set the item.
- * Here data will be saved in the LocalStorage if it doesn't exist, otherwise we'll
- * try cookies and if we're not in a lucky day, data will be stored in a plain object.
+ * Here data will be saved...in a way or another:
+ * 1) localStorage
+ * 2) cookies
+ * 3) plain object
  *
  * An extra check is done here for the QuotaExceededError.
  * I'll try to save data and just silently warning it
@@ -341,8 +344,7 @@ var setItem = function setItem(key, value) {
 
 /**
  * Get the item
- * Here the object is taken from the localStorage if it was available,
- * or from the object if wasn't possible or if simple wasn't saved permanently
+ * Here the object is taken from the localStorage, if it was available, or from the object
  * @param  {String}  key
  * @param  {Boolean} [parsed=false]
  * @return {any}
@@ -393,13 +395,14 @@ var removeItem = function removeItem(key) {
   localstorage.removeItem(key);
 };
 
+/**
+ * Show/hide debug messages
+ * @param  {Boolean} value
+ */
 var showStorageLogger = function showStorageLogger(value) {
   setDebug(!!value);
 };
 
-/**
- * Exports all features, so will be possible to use it as an object as well
- */
 var index = { setItem: setItem, getItem: getItem, removeItem: removeItem, clear: clear };
 
 exports.setItem = setItem;

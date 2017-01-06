@@ -20,6 +20,7 @@ let checker
 
 /**
  * LocalStorage check
+ * The check on the localStorage is done only one time
  * @return {Boolean}
  */
 const hasLocalStorage = () => {
@@ -44,8 +45,10 @@ const hasLocalStorage = () => {
 
 /**
  * Set the item.
- * Here data will be saved in the LocalStorage if it doesn't exist, otherwise we'll
- * try cookies and if we're not in a lucky day, data will be stored in a plain object.
+ * Here data will be saved...in a way or another:
+ * 1) localStorage
+ * 2) cookies
+ * 3) plain object
  *
  * An extra check is done here for the QuotaExceededError.
  * I'll try to save data and just silently warning it
@@ -81,8 +84,7 @@ export const setItem = (key, value, persistency = true) => {
 
 /**
  * Get the item
- * Here the object is taken from the localStorage if it was available,
- * or from the object if wasn't possible or if simple wasn't saved permanently
+ * Here the object is taken from the localStorage, if it was available, or from the object
  * @param  {String}  key
  * @param  {Boolean} [parsed=false]
  * @return {any}
@@ -131,11 +133,12 @@ export const removeItem = (key) => {
   localstorage.removeItem(key)
 }
 
+/**
+ * Show/hide debug messages
+ * @param  {Boolean} value
+ */
 export const showStorageLogger = (value) => {
   setDebug(!!value)
 }
 
-/**
- * Exports all features, so will be possible to use it as an object as well
- */
 export default { setItem, getItem, removeItem, clear }

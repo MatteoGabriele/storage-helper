@@ -34,7 +34,7 @@ export const parse = (data) => {
 }
 
 /**
- * Checks if running a browser environment
+ * Checks if we are in a browser
  * @type {Boolean}
  */
 export const isBrowser = typeof window !== 'undefined'
