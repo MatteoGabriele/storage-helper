@@ -12,35 +12,21 @@ import { debug, setDebug } from './config'
 const localstorage = isCookieEnabled ? window.localStorage : undefined
 
 /**
- * To avoid the try/catch to be called multiple times, the value
- * of the check is gonna be stored here.
- * @type {Boolean}
- */
-let checker
-
-/**
- * LocalStorage check
- * The check on the localStorage is done only one time
+ * Check if the browser has localStorage
  * @return {Boolean}
  */
-const hasLocalStorage = () => {
+const hasLocalStorage = function () {
   if (!localstorage) {
-    checker = false
-  }
-
-  if (typeof checker !== 'undefined') {
-    return checker
+    return false
   }
 
   try {
     localstorage.setItem('0', '')
     localstorage.removeItem('0')
-    checker = true
-  } catch (e) {
-    checker = false
+    return true
+  } catch (error) {
+    return false
   }
-
-  return checker
 }
 
 /**
