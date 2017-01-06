@@ -1,9 +1,9 @@
 var fs = require('fs')
-var zlib = require('zlib')
 var banner = require('./banner')
 var rollup = require('rollup')
 var uglify = require('uglify-js')
 var babel = require('rollup-plugin-babel')
+var chalk = require('chalk')
 var pack = require('../package.json')
 
 // CommonJS build.
@@ -64,7 +64,6 @@ rollup.rollup({
     }).code
     return write('dist/' + pack.name + '.min.js', minified)
   })
-  .then(zip)
 })
 .catch(logError)
 
@@ -81,20 +80,8 @@ function write (dest, code) {
   return new Promise(function (resolve, reject) {
     fs.writeFile(dest, code, function (err) {
       if (err) return reject(err)
-      console.log(blue(dest) + ' ' + getSize(code))
+      console.log('\n' + chalk.green.bold(dest) + ' ' + getSize(code) + '\n')
       resolve()
-    })
-  })
-}
-
-function zip () {
-  return new Promise(function (resolve, reject) {
-    fs.readFile('dist/' + pack.name + '.min.js', function (err, buf) {
-      if (err) return reject(err)
-      zlib.gzip(buf, function (err, buf) {
-        if (err) return reject(err)
-        write('dist/' + pack.name + '.min.js.gz', buf).then(resolve)
-      })
     })
   })
 }
@@ -105,8 +92,4 @@ function getSize (code) {
 
 function logError (e) {
   console.log(e)
-}
-
-function blue (str) {
-  return '\x1b[1m\x1b[34m' + str + '\x1b[39m\x1b[22m'
 }

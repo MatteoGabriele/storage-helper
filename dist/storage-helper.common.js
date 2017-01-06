@@ -24,7 +24,7 @@ var storage = [];
  * @param {String} key
  * @param {String} value
  */
-var setItem$1 = function setItem$1(key, value) {
+var setItem$1 = function setItem(key, value) {
   storage[key] = typeof value === 'string' ? value : JSON.stringify(value);
 };
 
@@ -35,11 +35,11 @@ var setItem$1 = function setItem$1(key, value) {
  * @param  {String} key
  * @return {String}
  */
-var getItem$1 = function getItem$1(key) {
+var getItem$1 = function getItem(key) {
   return storage[key] || null;
 };
 
-var clear$1 = function clear$1() {
+var clear$1 = function clear() {
   storage = [];
 };
 
@@ -47,7 +47,7 @@ var clear$1 = function clear$1() {
  * Remove item from the session storage
  * @param  {String}  key
  */
-var removeItem$1 = function removeItem$1(key) {
+var removeItem$1 = function removeItem(key) {
   if (!storage[key]) {
     return;
   }
@@ -67,89 +67,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return typeof obj;
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
 };
 
 /**
@@ -210,7 +127,7 @@ var isCookieEnabled = isBrowser && navigator && navigator.cookieEnabled;
  * @param {String} value
  * @param {Number} [expires=1]
  */
-var setItem$2 = function setItem$2(key, value) {
+var setItem$2 = function setItem(key, value) {
   var expires = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
   if (!isCookieEnabled) {
@@ -228,7 +145,7 @@ var setItem$2 = function setItem$2(key, value) {
  * @param  {String} key
  * @return {String}
  */
-var getItem$2 = function getItem$2(key) {
+var getItem$2 = function getItem(key) {
   return cookie.get(key);
 };
 
@@ -236,14 +153,14 @@ var getItem$2 = function getItem$2(key) {
  * Remove cookie
  * @param  {String} key [description]
  */
-var removeItem$2 = function removeItem$2(key) {
+var removeItem$2 = function removeItem(key) {
   cookie.remove(key);
 };
 
 /**
  * Remove all cookies
  */
-var clear$2 = function clear$2() {
+var clear$2 = function clear() {
   var cookies = isBrowser && document.cookie.split(';');
 
   if (!cookies.length) {
