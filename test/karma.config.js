@@ -3,26 +3,37 @@ var isTravis = !!process.env.TRAVIS
 
 delete webpackConfig.entry
 
+let browsers = ['PhantomJS']
+
+/**
+ * For now i can't get Travis works with this browsers.
+ * Don't know how to install them!
+ */
+if (!isTravis) {
+  browsers.push('Chrome', 'SafariPrivate')
+}
+
 module.exports = function (config) {
   config.set({
-    browsers: ['PhantomJS'],
+    browsers: browsers,
     singleRun: isTravis,
     frameworks: ['mocha', 'chai'],
     reporters: ['mocha'],
     files: [
-        './index.js',
+      './index.js',
     ],
     plugins: [
-        'karma-phantomjs-launcher',
-        'karma-chai',
-        'karma-mocha',
-        'karma-webpack',
-        'karma-mocha-reporter',
-        'karma-chrome-launcher',
-        'karma-sourcemap-loader'
+      'karma-phantomjs-launcher',
+      'karma-chai',
+      'karma-mocha',
+      'karma-webpack',
+      'karma-mocha-reporter',
+      'karma-chrome-launcher',
+      'karma-safari-private-launcher',
+      'karma-sourcemap-loader'
     ],
     preprocessors: {
-        './index.js': ['webpack', 'sourcemap']
+      './index.js': ['webpack', 'sourcemap']
     },
     webpack: {
       devtool: 'inline-source-map',

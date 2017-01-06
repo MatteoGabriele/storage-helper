@@ -2421,7 +2421,7 @@ karma-phantomjs-launcher@^1.0.2:
     lodash "^4.0.1"
     phantomjs-prebuilt "^2.1.7"
 
-karma-safari-private-launcher@^1.0.0:
+karma-safari-private-launcher:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/karma-safari-private-launcher/-/karma-safari-private-launcher-1.0.0.tgz#77fce904882b341bd13415afd3529cb922640b43"
   dependencies:
