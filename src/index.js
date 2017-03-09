@@ -75,7 +75,7 @@ export const setItem = (key, value, persistency = true) => {
  * @param  {Boolean} [parsed=false]
  * @return {any}
  */
-export const getItem = (key, parsed = false) => {
+export const getItem = (key, parsed = false, fallbackValue) => {
   let result
 
   const cookieItem = cookie.getItem(key)
@@ -87,7 +87,13 @@ export const getItem = (key, parsed = false) => {
     result = localstorage.getItem(key) || cookieItem || sessionItem
   }
 
-  return parsed ? parse(result) : result
+  const item = parsed ? parse(result) : result
+
+  if ((typeof item === 'undefined' || item === null) && typeof fallbackValue !== 'undefined') {
+    return fallbackValue
+  }
+
+  return item
 }
 
 /**

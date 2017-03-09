@@ -31,4 +31,9 @@ describe('Storage helper methods', () => {
     expect(getItem('foo')).to.be.null
     expect(getItem('bar')).to.be.null
   })
+
+  it ('should fallback to a default value if the item is null or undefined', () => {
+    expect(getItem('foo', false, 'bar')).to.equal('bar')
+    expect(getItem('foo', true, 'bar')).to.equal('bar')
+  })
 })
