@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { setItem, getItem, removeItem, clear } from '../../src/index'
+import { setItem, getItem, removeItem, clear } from '../../dist/storage-helper.min'
 
 describe('Storage helper methods', () => {
   it ('should be able to save an item and retrieve the value', () => {
