@@ -31,6 +31,9 @@ const foo = storageHelper.getItem(storageKey)
 // get item parsed
 const foo = storageHelper.getItem(storageKey, true)
 
+// get item with fallback value in case the item is undefined or null
+const foo = storageHelper.getItem(storageKey, false, 'foo')
+
 // remove item
 storageHelper.removeItem(storageKey)
 
