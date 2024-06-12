@@ -1,3 +1,5 @@
+> :warning: Sorry but this package is not longer maintained. With love, the guy who made the package.
+
 [![Build Status](https://travis-ci.org/MatteoGabriele/storage-helper.svg?branch=master)](https://travis-ci.org/MatteoGabriele/storage-helper) [![npm version](https://badge.fury.io/js/storage-helper.svg)](https://badge.fury.io/js/storage-helper) [![npm](https://img.shields.io/npm/dt/storage-helper.svg)](https://www.npmjs.com/package/storage-helper)
 
 # storage-helper
